@@ -3,10 +3,10 @@ import Link from "next/link";
 const NavButtons = () => {
   return (
     <>
-      <Link className="nav-sign-in" href="/sign-in">
+      <Link className="nav-sign-in" href="/signin">
         Sign in
       </Link>
-      <Link className="nav-sign-up gradient-surface" href="/sign-up">
+      <Link className="nav-sign-up gradient-surface" href="/signup">
         Sign up
       </Link>
     </>

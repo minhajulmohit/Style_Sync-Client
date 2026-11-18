@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Geist_Mono, Inter, Outfit } from "next/font/google";
 import Navbar from "@/components/navbar/navbar";
+import { Toaster } from "@/components/ui/toast";
 import "./globals.css";
 
 const outfit = Outfit({
@@ -30,8 +31,10 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       className={`${outfit.variable} ${inter.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">
-        <Navbar />
-        {children}
+        <Toaster>
+          <Navbar />
+          {children}
+        </Toaster>
       </body>
     </html>
   );
