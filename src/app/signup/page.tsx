@@ -125,6 +125,32 @@ export default function SignupPage() {
       });
       return;
     }
+    if (password.length < 6) {
+      toast.add({
+        type: "error",
+        title: "Password is too short",
+        description: "Password must be at least 6 characters long.",
+      });
+      return;
+    }
+
+    if (!/[A-Z]/.test(password)) {
+      toast.add({
+        type: "error",
+        title: "Password needs an uppercase letter",
+        description: "Add at least one uppercase letter (A-Z).",
+      });
+      return;
+    }
+
+    if (!/[a-z]/.test(password)) {
+      toast.add({
+        type: "error",
+        title: "Password needs a lowercase letter",
+        description: "Add at least one lowercase letter (a-z).",
+      });
+      return;
+    }
 
     setIsSubmitting(true);
 
