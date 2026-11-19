@@ -11,6 +11,7 @@ import {
   Scissors,
   UsersRound,
 } from "lucide-react"
+import Link from "next/link"
 import { Button } from "@/components/ui/button"
 
 const stats = [
@@ -80,7 +81,10 @@ export default function AdminDashboardPage() {
             >
               <Bell />
             </Button>
-            <Button className="h-10 rounded-xl gradient-surface px-4 shadow-md shadow-rose-200/50 hover:opacity-90">
+            <Button
+              render={<Link href="/dashboard/admin/add-service" />}
+              className="h-10 rounded-xl gradient-surface px-4 shadow-md shadow-rose-200/50 hover:opacity-90"
+            >
               <Plus />
               Add service
             </Button>

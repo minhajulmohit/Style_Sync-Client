@@ -13,6 +13,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { authClient } from "@/lib/auth-client";
+import { usePathname } from "next/navigation";
 import {
   Sidebar,
   SidebarContent,
@@ -34,7 +35,7 @@ const adminLinks = [
     path: "/dashboard/admin/manage-services",
   },
   {
-    label: "Add Service",
+    label: "Add/Update Service",
     icon: Settings2,
     path: "/dashboard/admin/add-service",
   },
@@ -75,6 +76,7 @@ const customerLinks = [
 ];
 
 export function DashboardSidebar() {
+  const pathname = usePathname();
   const { data: session } = authClient.useSession();
   const isAdmin = (session?.user?.role ?? "")
     .split(",")
@@ -120,10 +122,14 @@ export function DashboardSidebar() {
           </SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu className="gap-1">
-              {links.map(({ label, icon: Icon }) => (
+              {links.map(({ label, icon: Icon, path }) => (
                 <SidebarMenuItem key={label}>
                   <SidebarMenuButton
-                    isActive={label === "Overview"}
+                    render={isAdmin ? <Link href={path} /> : undefined}
+                    isActive={
+                      pathname === path ||
+                      (label !== "Overview" && pathname.startsWith(`${path}/`))
+                    }
                     size="lg"
                     tooltip={label}
                     className="h-11 rounded-xl px-3 text-[#756a72] data-active:bg-rose-50 data-active:text-[#e94f72] data-active:shadow-sm data-active:shadow-rose-100/70"
