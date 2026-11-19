@@ -3,9 +3,13 @@ import type { ServiceStatus } from "@/types/services"
 export function ServiceStatusToggle({
   status,
   onToggle,
+  disabled = false,
+  isUpdating = false,
 }: {
   status: ServiceStatus
   onToggle: () => void
+  disabled?: boolean
+  isUpdating?: boolean
 }) {
   const isActive = status === "Active"
 
@@ -14,11 +18,12 @@ export function ServiceStatusToggle({
       type="button"
       role="switch"
       aria-checked={isActive}
-      aria-label={`Service status: ${status}`}
+      aria-label={`Service status: ${status}${isUpdating ? ", saving" : ""}`}
+      disabled={disabled}
       onClick={onToggle}
       className="flex h-10 items-center justify-between gap-2 rounded-xl border border-rose-100 px-3 text-sm font-medium text-[#756a72] transition hover:bg-rose-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose-300"
     >
-      {status}
+      {isUpdating ? "Saving..." : status}
       <span
         aria-hidden="true"
         className={`flex h-5 w-9 items-center rounded-full p-0.5 transition-colors ${

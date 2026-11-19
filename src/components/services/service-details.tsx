@@ -15,7 +15,8 @@ import { getServiceId } from "@/lib/api/services";
 import { DeleteServiceButton } from "@/components/services/delete-service-button";
 import { ServiceStatusToggle } from "@/components/services/service-status-toggle";
 import { UpdateServiceButton } from "@/components/services/update-service-button";
-import type { ServiceRecord } from "@/types/services";
+import { updateService } from "@/lib/actions/services";
+import type { AddServicePayload, ServiceRecord } from "@/types/services";
 
 export function ServiceDetails({ id }: { id: string }) {
   const { data: session, isPending: isSessionPending } =
@@ -23,6 +24,8 @@ export function ServiceDetails({ id }: { id: string }) {
   const [service, setService] = useState<ServiceRecord | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [errorMessage, setErrorMessage] = useState("");
+  const [statusError, setStatusError] = useState("");
+  const [isUpdatingStatus, setIsUpdatingStatus] = useState(false);
 
   useEffect(() => {
     let isCurrent = true;
@@ -57,6 +60,42 @@ export function ServiceDetails({ id }: { id: string }) {
   const isAdmin = (session?.user?.role ?? "")
     .split(",")
     .some((role) => role.trim().toLowerCase() === "admin");
+
+  const handleStatusToggle = async () => {
+    if (!service || isUpdatingStatus) {
+      return;
+    }
+
+    setIsUpdatingStatus(true);
+    setStatusError("");
+
+    const updatedServicePayload: AddServicePayload = {
+      serviceName: service.serviceName,
+      category: service.category,
+      description: service.description,
+      price: service.price,
+      duration: service.duration,
+      image: service.image,
+      status: service.status === "Active" ? "Inactive" : "Active",
+    };
+
+    try {
+      await updateService(
+        service.id ?? service._id ?? id,
+        updatedServicePayload,
+      );
+      setService({ ...service, ...updatedServicePayload });
+    } catch (error) {
+      console.error("Could not update service status:", error);
+      setStatusError(
+        error instanceof Error
+          ? error.message
+          : "Could not update service status. Please try again.",
+      );
+    } finally {
+      setIsUpdatingStatus(false);
+    }
+  };
 
   return (
     <div className="min-h-full bg-[#fffaf8] px-4 pb-10 pt-7 sm:px-7 lg:px-10">
@@ -160,23 +199,22 @@ export function ServiceDetails({ id }: { id: string }) {
                   {!isSessionPending &&
                     (isAdmin ? (
                       <div className="mt-7 grid gap-3 sm:grid-cols-3">
-                        <UpdateServiceButton />
-                        <DeleteServiceButton />
+                        <UpdateServiceButton
+                          service={service}
+                          serviceId={service.id ?? service._id ?? id}
+                          onUpdated={(updatedService) =>
+                            setService(updatedService)
+                          }
+                        />
+                        <DeleteServiceButton
+                          serviceId={service.id ?? service._id ?? id}
+                          serviceName={service.serviceName}
+                        />
                         <ServiceStatusToggle
                           status={service.status}
-                          onToggle={() =>
-                            setService((current) =>
-                              current
-                                ? {
-                                    ...current,
-                                    status:
-                                      current.status === "Active"
-                                        ? "Inactive"
-                                        : "Active",
-                                  }
-                                : current,
-                            )
-                          }
+                          disabled={isUpdatingStatus}
+                          isUpdating={isUpdatingStatus}
+                          onToggle={handleStatusToggle}
                         />
                       </div>
                     ) : (
@@ -188,6 +226,14 @@ export function ServiceDetails({ id }: { id: string }) {
                         Book Now
                       </Button>
                     ))}
+                  {statusError && (
+                    <p
+                      role="alert"
+                      className="mt-3 rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-700"
+                    >
+                      {statusError}
+                    </p>
+                  )}
                 </div>
               </div>
             </div>

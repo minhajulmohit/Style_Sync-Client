@@ -16,17 +16,21 @@ export const addService = async (service: AddServicePayload) => {
   }
 };
 
-export const deleteService = async (serviceId: string) => {
-  return fetch(`${baseUrl}/services/${serviceId}`, {
+export const deleteService = async (serviceId: string): Promise<void> => {
+  const response = await fetch(`${baseUrl}/services/${serviceId}`, {
     method: "DELETE",
   });
+
+  if (!response.ok) {
+    throw new Error(`Could not delete service (HTTP ${response.status}).`);
+  }
 };
 
 export const updateService = async (
   serviceId: string,
   serviceData: AddServicePayload,
-) => {
-  const res = await fetch(`${baseUrl}/jobs/${serviceId}`, {
+): Promise<void> => {
+  const res = await fetch(`${baseUrl}/services/${serviceId}`, {
     method: "PATCH",
     headers: {
       "Content-Type": "application/json",
@@ -36,6 +40,8 @@ export const updateService = async (
 
   if (!res.ok) {
     const message = await res.text();
-    throw new Error(message || `Failed to update job (${res.status})`);
+    throw new Error(
+      message || `Could not update service (HTTP ${res.status}).`,
+    );
   }
 };
