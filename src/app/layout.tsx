@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { Geist_Mono, Inter, Outfit } from "next/font/google";
-import Navbar from "@/components/navbar/navbar";
+
 import { Toaster } from "@/components/ui/toast";
 import "./globals.css";
 
@@ -32,7 +32,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
     >
       <body className="min-h-full flex flex-col">
         <Toaster>
-          <Navbar />
+
           {children}
         </Toaster>
       </body>
