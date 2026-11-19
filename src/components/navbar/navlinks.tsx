@@ -1,4 +1,7 @@
+"use client";
+
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 
 const navigationLinks = [
   { href: "/", label: "Home" },
@@ -6,17 +9,27 @@ const navigationLinks = [
 ];
 
 export function NavigationLinks() {
+  const pathname = usePathname();
+
   return (
     <>
-      {navigationLinks.map(({ href, label }, index) => (
-        <Link
-          key={href}
-          href={href}
-          className={`nav-link${index === 0 ? " nav-link--active" : ""}`}
-        >
-          {label}
-        </Link>
-      ))}
+      {navigationLinks.map(({ href, label }) => {
+        const isActive =
+          href === "/"
+            ? pathname === href
+            : pathname === href || pathname.startsWith(`${href}/`);
+
+        return (
+          <Link
+            key={href}
+            href={href}
+            aria-current={isActive ? "page" : undefined}
+            className={`nav-link${isActive ? " nav-link--active" : ""}`}
+          >
+            {label}
+          </Link>
+        );
+      })}
     </>
   );
 }

@@ -5,6 +5,7 @@ import { Clock3, ImageIcon } from "lucide-react"
 import Image from "next/image"
 import Link from "next/link"
 import { Button, buttonVariants } from "@/components/ui/button"
+import { formatServiceCategory } from "@/lib/utils"
 import type { ServiceRecord } from "@/types/services"
 
 export function ServiceCard({ service }: { service: ServiceRecord }) {
@@ -30,7 +31,7 @@ export function ServiceCard({ service }: { service: ServiceRecord }) {
           </div>
         )}
         <span className="absolute left-3 top-3 rounded-full border border-white/70 bg-white/90 px-3 py-1 text-xs font-medium text-[#b34d68] shadow-sm backdrop-blur">
-          {service.category}
+          {formatServiceCategory(service.category)}
         </span>
       </div>
 
