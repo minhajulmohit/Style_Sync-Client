@@ -19,6 +19,10 @@ export const getServiceId = async (
 ): Promise<ServiceRecord | null> => {
   const res = await fetch(`${baseUrl}/services/${serviceId}`)
 
+  if (!res.ok) {
+    throw new Error(`Could not load service (HTTP ${res.status}).`)
+  }
+
   const text = await res.text()
   return text ? JSON.parse(text) : null
 }
