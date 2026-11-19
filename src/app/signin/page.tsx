@@ -36,7 +36,7 @@ export default function SignInPage() {
       const { data, error } = await authClient.signIn.email({
         email,
         password,
-        callbackURL: "/",
+        callbackURL: "/dashboard",
       });
 
       if (error) {
@@ -62,7 +62,7 @@ export default function SignInPage() {
         title: "Signed in",
         description: "Welcome back to StyleSync.",
       });
-      router.push("/");
+      router.push("/dashboard");
       router.refresh();
     } catch (error) {
       console.error("Sign-in failed:", error);
