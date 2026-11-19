@@ -24,6 +24,11 @@ export type AddServicePayload = {
   status: ServiceStatus
 }
 
+export type ServiceRecord = AddServicePayload & {
+  id?: string
+  _id?: string
+}
+
 export type ImgBBUploadResponse = {
   success: boolean
   data?: {
