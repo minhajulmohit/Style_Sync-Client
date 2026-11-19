@@ -1,9 +1,8 @@
 import {
-  ArrowDownRight,
   ArrowRight,
-  ArrowUpRight,
   Bell,
-  CalendarDays,
+  CalendarCheck,
+  ClipboardList,
   CircleDollarSign,
   Clock3,
   MoreHorizontal,
@@ -16,35 +15,45 @@ import { Button } from "@/components/ui/button"
 
 const stats = [
   {
-    label: "Appointments today",
-    value: "18",
-    change: "+12.5%",
-    icon: CalendarDays,
-    positive: true,
+    label: "Total Registered Customers",
+    value: "1,248",
+    detail: "Registered accounts",
+    icon: UsersRound,
     color: "bg-rose-50 text-rose-500",
   },
   {
-    label: "Active services",
+    label: "Total Active Services",
     value: "24",
-    change: "2 new this month",
+    detail: "Available for booking",
     icon: Scissors,
-    positive: true,
     color: "bg-violet-50 text-violet-500",
   },
   {
-    label: "Total customers",
-    value: "1,248",
-    change: "+8.2%",
-    icon: UsersRound,
-    positive: true,
+    label: "Total Appointment Requests",
+    value: "186",
+    detail: "All appointment requests",
+    icon: ClipboardList,
     color: "bg-orange-50 text-orange-500",
   },
   {
-    label: "Monthly revenue",
-    value: "$8,420",
-    change: "-2.4%",
+    label: "Pending Appointments",
+    value: "12",
+    detail: "Awaiting confirmation",
+    icon: Clock3,
+    color: "bg-amber-50 text-amber-600",
+  },
+  {
+    label: "Confirmed Appointments",
+    value: "68",
+    detail: "Confirmed bookings",
+    icon: CalendarCheck,
+    color: "bg-emerald-50 text-emerald-600",
+  },
+  {
+    label: "Total Successful Payments",
+    value: "342",
+    detail: "Completed payments",
     icon: CircleDollarSign,
-    positive: false,
     color: "bg-emerald-50 text-emerald-600",
   },
 ]
@@ -93,9 +102,9 @@ export default function AdminDashboardPage() {
 
         <section
           aria-label="Business overview"
-          className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4"
+          className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3"
         >
-          {stats.map(({ label, value, change, icon: Icon, positive, color }) => (
+          {stats.map(({ label, value, detail, icon: Icon, color }) => (
             <article
               key={label}
               className="rounded-2xl border border-rose-100/70 bg-white p-5 shadow-sm shadow-rose-100/40"
@@ -117,12 +126,7 @@ export default function AdminDashboardPage() {
                 <p className="font-heading text-2xl font-semibold tracking-tight text-[#352a31]">
                   {value}
                 </p>
-                <span
-                  className={`mb-1 inline-flex items-center gap-1 text-xs font-medium ${positive ? "text-emerald-600" : "text-rose-500"}`}
-                >
-                  {positive ? <ArrowUpRight size={14} /> : <ArrowDownRight size={14} />}
-                  {change}
-                </span>
+                <span className="mb-1 text-xs text-[#9a8d95]">{detail}</span>
               </div>
             </article>
           ))}

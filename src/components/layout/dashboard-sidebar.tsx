@@ -35,7 +35,7 @@ const adminLinks = [
     path: "/dashboard/admin/manage-services",
   },
   {
-    label: "Add/Update Service",
+    label: "Add Service",
     icon: Settings2,
     path: "/dashboard/admin/add-service",
   },
