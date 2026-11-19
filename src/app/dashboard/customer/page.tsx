@@ -161,7 +161,7 @@ export default function CustomerDashboardPage() {
               </div>
             </section>
 
-            <section className="rounded-2xl border border-rose-100/70 bg-gradient-to-br from-[#fff4f1] to-[#f8f0ff] p-5 sm:p-6">
+            <section className="rounded-2xl border border-rose-100/70 bg-linear-to-br from-[#fff4f1] to-[#f8f0ff] p-5 sm:p-6">
               <span className="inline-flex size-10 items-center justify-center rounded-xl bg-white/80 text-[#e96b83] shadow-sm">
                 <Sparkles aria-hidden="true" size={18} />
               </span>

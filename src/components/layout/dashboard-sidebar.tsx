@@ -31,22 +31,22 @@ const adminLinks = [
   {
     label: "Manage Services",
     icon: Scissors,
-    path: "/dashboard/admin/manageservices",
+    path: "/dashboard/admin/manage-services",
   },
   {
     label: "Add Service",
     icon: Settings2,
-    path: "/dashboard/admin/addservice",
+    path: "/dashboard/admin/add-service",
   },
   {
     label: "Manage Appointments",
     icon: CalendarDays,
-    path: "/dashboard/admin/manageappointments",
+    path: "/dashboard/admin/manage-appointments",
   },
   {
     label: "Manage Users",
     icon: UsersRound,
-    path: "/dashboard/admin/manageusers",
+    path: "/dashboard/admin/manage-users",
   },
   {
     label: "Transactions",
@@ -56,7 +56,7 @@ const adminLinks = [
   {
     label: "My Profile",
     icon: CircleUserRound,
-    path: "/dashboard/admin/adminprofile",
+    path: "/dashboard/admin/admin-profile",
   },
 ];
 
@@ -65,12 +65,12 @@ const customerLinks = [
   {
     label: "My Appointments",
     icon: CalendarDays,
-    path: "/dashboard/customer/myappointments",
+    path: "/dashboard/customer/my-appointments",
   },
   {
     label: "My Profile",
     icon: CircleUserRound,
-    path: "/dashboard/customer/userprofile",
+    path: "/dashboard/customer/user-profile",
   },
 ];
 
@@ -90,9 +90,9 @@ export function DashboardSidebar() {
     <Sidebar
       variant="sidebar"
       collapsible="icon"
-      className="top-20! h-[calc(100svh-5rem)]! border-r border-rose-100/70 bg-white"
+      className="top-0! h-svh! border-r border-rose-100/70 bg-white"
     >
-      <SidebarHeader className="px-5 pb-5 pt-0 group-data-[collapsible=icon]:items-center group-data-[collapsible=icon]:px-1">
+      <SidebarHeader className="px-5 pb-5 pt-3 group-data-[collapsible=icon]:items-center group-data-[collapsible=icon]:px-1">
         <Link
           href="/"
           aria-label="StyleSync home"
