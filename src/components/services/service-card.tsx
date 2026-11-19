@@ -1,16 +1,20 @@
+"use client"
+
+import { useState } from "react"
 import { Clock3, ImageIcon } from "lucide-react"
 import Image from "next/image"
 import Link from "next/link"
-import { Button } from "@/components/ui/button"
+import { Button, buttonVariants } from "@/components/ui/button"
 import type { ServiceRecord } from "@/types/services"
 
 export function ServiceCard({ service }: { service: ServiceRecord }) {
   const serviceId = service.id ?? service._id
+  const [failedImage, setFailedImage] = useState("")
 
   return (
     <article className="overflow-hidden rounded-2xl border border-rose-100/70 bg-white shadow-sm shadow-rose-100/40 transition duration-200 hover:-translate-y-0.5 hover:shadow-md hover:shadow-rose-100/60">
       <div className="relative aspect-16/10 overflow-hidden bg-linear-to-br from-rose-50 via-orange-50 to-purple-50">
-        {service.image ? (
+        {service.image && failedImage !== service.image ? (
           <Image
             src={service.image}
             alt={service.serviceName}
@@ -18,6 +22,7 @@ export function ServiceCard({ service }: { service: ServiceRecord }) {
             unoptimized
             sizes="(max-width: 640px) 100vw, (max-width: 1280px) 50vw, 33vw"
             className="object-cover"
+            onError={() => setFailedImage(service.image)}
           />
         ) : (
           <div className="flex size-full items-center justify-center text-[#e77a8e]">
@@ -47,16 +52,26 @@ export function ServiceCard({ service }: { service: ServiceRecord }) {
           </span>
         </div>
 
-        <Button
-          render={
-            serviceId ? <Link href={`/services/${serviceId}`} /> : undefined
-          }
-          disabled={!serviceId}
-          variant="outline"
-          className="mt-4 h-10 w-full rounded-xl border-rose-100 text-[#e45c78] hover:bg-rose-50 hover:text-[#d34c6b]"
-        >
-          View Details
-        </Button>
+        {serviceId ? (
+          <Link
+            href={`/services/${serviceId}`}
+            className={buttonVariants({
+              variant: "outline",
+              className:
+                "mt-4 h-10 w-full rounded-xl border-rose-100 text-[#e45c78] hover:bg-rose-50 hover:text-[#d34c6b]",
+            })}
+          >
+            View Details
+          </Link>
+        ) : (
+          <Button
+            disabled
+            variant="outline"
+            className="mt-4 h-10 w-full rounded-xl border-rose-100 text-[#e45c78]"
+          >
+            View Details
+          </Button>
+        )}
       </div>
     </article>
   )
