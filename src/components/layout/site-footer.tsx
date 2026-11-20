@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { Scissors } from "lucide-react";
+import { FaFacebookF, FaInstagram } from "react-icons/fa";
 
 const footerLinkClass = "nav-link !px-0 !py-1";
 
@@ -12,12 +13,16 @@ const quickLinks = [
 
 const socialLinks = [
   {
-    href: "https://example.com/instagram",
-    label: "Instagram (demo link)",
+    href: "https://www.facebook.com/",
+    label: "Facebook",
+    icon: FaFacebookF,
+    iconClass: "bg-[#1877f2]",
   },
   {
-    href: "https://example.com/facebook",
-    label: "Facebook (demo link)",
+    href: "https://www.instagram.com/",
+    label: "Instagram",
+    icon: FaInstagram,
+    iconClass: "bg-gradient-to-tr from-[#feda75] via-[#d62976] to-[#4f5bd5]",
   },
 ];
 
@@ -41,9 +46,6 @@ export default function SiteFooter() {
           <p className={`${footerLinkClass} mt-3`}>
             Salon bookings, made simple.
           </p>
-          <p className={`${footerLinkClass} mt-2`}>
-            Sample footer details — replace before launch.
-          </p>
         </section>
 
         <nav aria-label="Footer navigation" className="flex flex-col items-start">
@@ -62,15 +64,15 @@ export default function SiteFooter() {
           >
             Contact
           </h2>
-          <p className={footerLinkClass}>Sample address, Dhaka, Bangladesh</p>
-          <a className={footerLinkClass} href="tel:+880000000000">
-            +880 0000-000000 (sample)
+          <p className={footerLinkClass}>Tejgaon, Dhaka, Bangladesh</p>
+          <a className={footerLinkClass} href="tel:+8801234567890">
+            +880 1234-567890
           </a>
           <a
             className={footerLinkClass}
-            href="mailto:hello@stylesync.example"
+            href="mailto:info@stylesync.com"
           >
-            hello@stylesync.example
+            info@stylesync.com
           </a>
         </section>
 
@@ -81,19 +83,26 @@ export default function SiteFooter() {
           >
             Hours &amp; social
           </h2>
-          <p className={footerLinkClass}>Mon–Sat: 9:00 AM–8:00 PM (sample)</p>
-          <p className={footerLinkClass}>Sunday: Closed (sample)</p>
-          {socialLinks.map(({ href, label }) => (
-            <a
-              key={label}
-              className={footerLinkClass}
-              href={href}
-              target="_blank"
-              rel="noreferrer"
-            >
-              {label}
-            </a>
-          ))}
+          <p className={footerLinkClass}>Open 24 hours</p>
+          <div className="mt-2 flex flex-wrap gap-2">
+            {socialLinks.map(({ href, label, icon: Icon, iconClass }) => (
+              <a
+                key={label}
+                className="nav-link !px-3 !py-1.5 rounded-full border border-rose-100 bg-white text-[#756a72] transition hover:-translate-y-0.5 hover:border-rose-200 hover:text-[#c65371] hover:shadow-md focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-rose-400"
+                href={href}
+                target="_blank"
+                rel="noreferrer"
+                aria-label={`Visit ${label}`}
+              >
+                <span
+                  className={`grid size-8 place-items-center rounded-full text-white ${iconClass}`}
+                >
+                  <Icon aria-hidden="true" className="size-4" />
+                </span>
+                {label}
+              </a>
+            ))}
+          </div>
         </section>
       </div>
       <div className="mx-auto mt-8 max-w-7xl border-t border-rose-100 pt-4">
