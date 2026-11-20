@@ -1,9 +1,12 @@
+"use server";
+
+import { authenticatedFetch } from "@/lib/actions/authenticated-fetch";
 import type { AddServicePayload } from "@/types/services";
 
 const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8000";
 
 export const addService = async (service: AddServicePayload) => {
-  const response = await fetch(`${baseUrl}/add-service`, {
+  const response = await authenticatedFetch(`${baseUrl}/add-service`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -17,7 +20,7 @@ export const addService = async (service: AddServicePayload) => {
 };
 
 export const deleteService = async (serviceId: string): Promise<void> => {
-  const response = await fetch(`${baseUrl}/services/${serviceId}`, {
+  const response = await authenticatedFetch(`${baseUrl}/services/${serviceId}`, {
     method: "DELETE",
   });
 
@@ -30,7 +33,7 @@ export const updateService = async (
   serviceId: string,
   serviceData: AddServicePayload,
 ): Promise<void> => {
-  const res = await fetch(`${baseUrl}/services/${serviceId}`, {
+  const res = await authenticatedFetch(`${baseUrl}/services/${serviceId}`, {
     method: "PATCH",
     headers: {
       "Content-Type": "application/json",

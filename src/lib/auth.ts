@@ -27,5 +27,5 @@ export const auth = betterAuth({
   database: mongodbAdapter(db, {
     client,
   }),
-  plugins: [admin()],
+  plugins: [admin({ defaultRole: "customer" })],
 });

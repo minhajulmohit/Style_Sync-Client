@@ -1,4 +1,6 @@
+"use server";
 
+import { authenticatedFetch } from "@/lib/actions/authenticated-fetch";
 
 const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8000";
 
@@ -26,7 +28,7 @@ type NewBooking = Pick<
 >;
 
 export const getBookings = async (query = ""): Promise<BookingRecord[]> => {
-  const res = await fetch(`${baseUrl}/bookings?${query}`);
+  const res = await authenticatedFetch(`${baseUrl}/bookings?${query}`);
 
   if (!res.ok) {
     throw new Error(`Could not load bookings (HTTP ${res.status}).`);
@@ -51,7 +53,7 @@ export const getBookedSlots = async (
 };
 
 export const createBooking = async (booking: NewBooking): Promise<void> => {
-  const res = await fetch(`${baseUrl}/bookings`, {
+  const res = await authenticatedFetch(`${baseUrl}/bookings`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -72,7 +74,7 @@ export const cancelBooking = async (
   bookingId: string,
   userId: string,
 ): Promise<void> => {
-  const res = await fetch(`${baseUrl}/bookings/${bookingId}`, {
+  const res = await authenticatedFetch(`${baseUrl}/bookings/${bookingId}`, {
     method: "PATCH",
     headers: {
       "Content-Type": "application/json",
@@ -97,7 +99,7 @@ export const cancelBooking = async (
 export const getBookingsCount = async (
   query = "",
 ): Promise<{ count: number }> => {
-  const res = await fetch(`${baseUrl}/bookings/count?${query}`);
+  const res = await authenticatedFetch(`${baseUrl}/bookings/count?${query}`);
 
   if (!res.ok) {
     throw new Error(`Could not load booking count (HTTP ${res.status}).`);
