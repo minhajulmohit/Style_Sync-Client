@@ -9,12 +9,15 @@ export type BookingRecord = {
   userId: string;
   serviceId: string;
   serviceName?: string;
+  servicePrice?: number;
   date: string;
   time: string;
   duration?: number;
   message?: string;
   status: string;
+  paymentStatus?: string;
   cancelledBy?: string;
+  createdAt?: string | Date;
 };
 
 export type BookedSlot = {

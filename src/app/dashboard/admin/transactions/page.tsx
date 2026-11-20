@@ -12,6 +12,8 @@ type Transaction = {
   payment_intent?: string;
   payment_status?: string;
   payment_date?: string | Date;
+  amount_total?: number | null;
+  currency?: string | null;
 };
 
 async function getTransactions(): Promise<Transaction[]> {
@@ -38,6 +40,15 @@ function formatDate(value?: string | Date) {
     hour: "numeric",
     minute: "2-digit",
   });
+}
+
+function formatAmount(amount?: number | null, currency?: string | null) {
+  if (amount === null || amount === undefined) return "—";
+
+  return new Intl.NumberFormat("en-US", {
+    style: "currency",
+    currency: currency?.toUpperCase() ?? "USD",
+  }).format(amount / 100);
 }
 
 export default function TransactionsPage() {
@@ -86,10 +97,11 @@ async function TransactionsTable() {
         </span>
       </div>
       <div className="overflow-x-auto">
-        <table className="w-full min-w-[760px] text-left text-sm">
+        <table className="w-full min-w-[880px] text-left text-sm">
           <thead>
             <tr className="border-b border-rose-100/70 bg-rose-50/50 text-xs text-[#8e7e86]">
               <th className="px-4 py-3 font-medium">Customer</th>
+              <th className="px-4 py-3 font-medium">Amount</th>
               <th className="px-4 py-3 font-medium">Payment intent</th>
               <th className="px-4 py-3 font-medium">Session ID</th>
               <th className="px-4 py-3 font-medium">Payment status</th>
@@ -109,6 +121,9 @@ async function TransactionsTable() {
               >
                 <td className="px-4 py-4">
                   {transaction.customer_email || transaction.userId || "—"}
+                </td>
+                <td className="px-4 py-4 whitespace-nowrap">
+                  {formatAmount(transaction.amount_total, transaction.currency)}
                 </td>
                 <td className="max-w-52 break-all px-4 py-4 text-xs">
                   {transaction.payment_intent || "—"}
@@ -134,7 +149,7 @@ async function TransactionsTable() {
             ))}
             {transactions.length === 0 && (
               <tr>
-                <td colSpan={5} className="px-4 py-14 text-center">
+                <td colSpan={6} className="px-4 py-14 text-center">
                   <BadgeDollarSign
                     aria-hidden="true"
                     className="mx-auto mb-3 text-[#d3b8c0]"

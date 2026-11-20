@@ -33,9 +33,11 @@ type Appointment = {
   category?: string
   date: string
   time: string
+  requestDate?: string | Date
   price?: number
   message?: string
   status: string
+  paymentStatus: string
   cancelledBy?: "user" | "admin"
 }
 
@@ -64,6 +66,25 @@ function formatDate(date: string) {
     month: "short",
     day: "numeric",
     year: "numeric",
+  })
+}
+
+function formatRequestDate(value?: string | Date) {
+  if (!value) {
+    return "—"
+  }
+
+  const parsedDate = new Date(value)
+  if (Number.isNaN(parsedDate.getTime())) {
+    return "—"
+  }
+
+  return parsedDate.toLocaleString("en-US", {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+    hour: "numeric",
+    minute: "2-digit",
   })
 }
 
@@ -110,9 +131,11 @@ function getAppointment(
     category: service?.category,
     date: booking.date,
     time: booking.time,
-    price: service?.price,
+    requestDate: booking.createdAt,
+    price: booking.servicePrice ?? service?.price,
     message: booking.message,
     status: normalizeStatus(booking.status),
+    paymentStatus: booking.paymentStatus ?? "Unpaid",
     cancelledBy: normalizeCancelledBy(booking.cancelledBy),
   }
 }
@@ -128,6 +151,22 @@ function StatusBadge({ status }: { status: string }) {
     <span
       className={`inline-flex rounded-full px-2.5 py-1 text-xs font-medium ${
         styles[status] ?? "bg-slate-100 text-slate-700"
+      }`}
+    >
+      {status}
+    </span>
+  )
+}
+
+function PaymentStatusBadge({ status }: { status: string }) {
+  const isPaid = status.toLowerCase() === "paid"
+
+  return (
+    <span
+      className={`inline-flex rounded-full px-2.5 py-1 text-xs font-medium ${
+        isPaid
+          ? "bg-emerald-50 text-emerald-700"
+          : "bg-amber-50 text-amber-700"
       }`}
     >
       {status}
@@ -196,6 +235,23 @@ function AppointmentActions({
           {isCancelling ? "Cancelling..." : "Cancel Request"}
         </Button>
       )}
+      {appointment.status === "Confirmed" &&
+        appointment.paymentStatus === "Unpaid" &&
+        appointment.bookingId && (
+          <form action="/api/checkout_sessions" method="POST">
+            <input
+              type="hidden"
+              name="bookingId"
+              value={appointment.bookingId}
+            />
+            <Button
+              type="submit"
+              className="h-9 rounded-xl bg-[#e45c78] text-white hover:bg-[#d64f70]"
+            >
+              Pay Now
+            </Button>
+          </form>
+        )}
       <Button
         type="button"
         variant="ghost"
@@ -272,6 +328,12 @@ function AppointmentDetails({
               {appointment.time}
             </p>
           </div>
+          <div className="rounded-xl bg-[#fff7f4] p-4">
+            <p className="text-xs text-[#9a8d95]">Request date</p>
+            <p className="mt-1 text-sm font-medium text-[#493943]">
+              {formatRequestDate(appointment.requestDate)}
+            </p>
+          </div>
           {appointment.price !== undefined && (
             <div className="rounded-xl bg-[#fff7f4] p-4">
               <p className="text-xs text-[#9a8d95]">Price</p>
@@ -287,6 +349,12 @@ function AppointmentDetails({
               {appointment.status === "Cancelled" && (
                 <CancellationLabel cancelledBy={appointment.cancelledBy} />
               )}
+            </div>
+          </div>
+          <div className="rounded-xl bg-[#fff7f4] p-4">
+            <p className="text-xs text-[#9a8d95]">Payment status</p>
+            <div className="mt-2">
+              <PaymentStatusBadge status={appointment.paymentStatus} />
             </div>
           </div>
           {appointment.message && (
@@ -527,14 +595,16 @@ export default function MyAppointmentsPage() {
           ) : (
             <>
               <div className="hidden overflow-x-auto md:block">
-                <table className="w-full min-w-[900px] text-left">
+                <table className="w-full min-w-[1180px] text-left">
                   <thead className="bg-[#fffaf8] text-xs font-medium text-[#9a8d95]">
                     <tr>
                       <th className="px-6 py-4">Service</th>
                       <th className="px-4 py-4">Category</th>
                       <th className="px-4 py-4">Date &amp; time</th>
                       <th className="px-4 py-4">Price</th>
+                      <th className="px-4 py-4">Request date</th>
                       <th className="px-4 py-4">Status</th>
+                      <th className="px-4 py-4">Payment</th>
                       <th className="px-6 py-4">Action</th>
                     </tr>
                   </thead>
@@ -566,6 +636,9 @@ export default function MyAppointmentsPage() {
                             ? `$${appointment.price.toFixed(2)}`
                             : "—"}
                         </td>
+                        <td className="px-4 py-4 whitespace-nowrap text-xs text-[#756a72]">
+                          {formatRequestDate(appointment.requestDate)}
+                        </td>
                         <td className="px-4 py-4">
                           <StatusBadge status={appointment.status} />
                           {appointment.status === "Cancelled" && (
@@ -573,6 +646,11 @@ export default function MyAppointmentsPage() {
                               cancelledBy={appointment.cancelledBy}
                             />
                           )}
+                        </td>
+                        <td className="px-4 py-4">
+                          <PaymentStatusBadge
+                            status={appointment.paymentStatus}
+                          />
                         </td>
                         <td className="px-6 py-4">
                           <AppointmentActions
@@ -621,6 +699,14 @@ export default function MyAppointmentsPage() {
                         </p>
                       </div>
                       <div>
+                        <p className="text-[11px] text-[#9a8d95]">
+                          Request date
+                        </p>
+                        <p className="mt-1 text-xs font-medium text-[#493943]">
+                          {formatRequestDate(appointment.requestDate)}
+                        </p>
+                      </div>
+                      <div>
                         <p className="mb-1.5 text-[11px] text-[#9a8d95]">
                           Status
                         </p>
@@ -630,6 +716,14 @@ export default function MyAppointmentsPage() {
                             cancelledBy={appointment.cancelledBy}
                           />
                         )}
+                      </div>
+                      <div>
+                        <p className="mb-1.5 text-[11px] text-[#9a8d95]">
+                          Payment
+                        </p>
+                        <PaymentStatusBadge
+                          status={appointment.paymentStatus}
+                        />
                       </div>
                     </div>
                     <AppointmentActions

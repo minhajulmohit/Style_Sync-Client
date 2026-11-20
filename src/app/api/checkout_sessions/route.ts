@@ -1,32 +1,156 @@
-import { NextResponse } from 'next/server'
-import { headers } from 'next/headers'
+import { NextResponse } from "next/server";
+import { headers } from "next/headers";
+import { auth } from "@/lib/auth";
+import { getStripe } from "@/lib/stripe";
 
-import { stripe } from '../../../lib/stripe'
+const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8000";
 
-export async function POST() {
+type CheckoutBooking = {
+  _id: string;
+  userId: string;
+  serviceId: string;
+  serviceName?: string;
+  servicePrice?: number;
+  status: string;
+  paymentStatus: string;
+};
+
+type CheckoutService = {
+  serviceName: string;
+  price: number;
+};
+
+export async function POST(request: Request) {
   try {
-    const headersList = await headers()
-    const origin = headersList.get('origin')
+    const authSession = await auth.api.getSession({
+      headers: await headers(),
+    });
 
-    // Create Checkout Sessions from body params.
-    const session = await stripe.checkout.sessions.create({
+    if (!authSession?.session.token) {
+      return NextResponse.redirect(new URL("/signin", request.url), 303);
+    }
+
+    if (authSession.user.role?.toLowerCase() !== "customer") {
+      return NextResponse.json(
+        { error: "Only customers can pay for appointments." },
+        { status: 403 },
+      );
+    }
+
+    const formData = await request.formData();
+    const bookingId = formData.get("bookingId");
+
+    if (typeof bookingId !== "string" || !bookingId) {
+      return NextResponse.json(
+        { error: "An appointment is required for checkout." },
+        { status: 400 },
+      );
+    }
+
+    const authorization = {
+      authorization: `Bearer ${authSession.session.token}`,
+    };
+    const bookingsResponse = await fetch(`${baseUrl}/bookings`, {
+      headers: authorization,
+      cache: "no-store",
+    });
+
+    if (!bookingsResponse.ok) {
+      return NextResponse.json(
+        { error: "Could not verify this appointment." },
+        { status: bookingsResponse.status },
+      );
+    }
+
+    const bookings: CheckoutBooking[] = await bookingsResponse.json();
+    const booking = bookings.find(
+      (item) =>
+        item._id === bookingId &&
+        item.userId === authSession.user.id &&
+        item.status === "Confirmed" &&
+        item.paymentStatus === "Unpaid",
+    );
+
+    if (!booking) {
+      return NextResponse.json(
+        { error: "This confirmed unpaid appointment was not found." },
+        { status: 404 },
+      );
+    }
+
+    let serviceName = booking.serviceName;
+    let servicePrice = booking.servicePrice;
+
+    if (servicePrice === undefined) {
+      const serviceResponse = await fetch(
+        `${baseUrl}/services/${encodeURIComponent(booking.serviceId)}`,
+        { cache: "no-store" },
+      );
+
+      if (!serviceResponse.ok) {
+        return NextResponse.json(
+          { error: "Could not load the appointment service." },
+          { status: serviceResponse.status },
+        );
+      }
+
+      const service: CheckoutService = await serviceResponse.json();
+      serviceName = service.serviceName;
+      servicePrice = service.price;
+    }
+
+    if (
+      typeof servicePrice !== "number" ||
+      !Number.isFinite(servicePrice) ||
+      servicePrice <= 0
+    ) {
+      return NextResponse.json(
+        { error: "The service price is invalid." },
+        { status: 422 },
+      );
+    }
+
+    const origin = new URL(request.url).origin;
+    const checkoutSession = await getStripe().checkout.sessions.create({
+      mode: "payment",
+      customer_email: authSession.user.email,
+      client_reference_id: bookingId,
       line_items: [
         {
-          // Provide the exact Price ID (for example, price_1234) of the product you want to sell
-          price: '{{PRICE_ID}}',
+          price_data: {
+            currency: "usd",
+            product_data: { name: serviceName || "Salon service" },
+            unit_amount: Math.round(servicePrice * 100),
+          },
           quantity: 1,
         },
       ],
-      mode: 'payment',
+      metadata: {
+        bookingId,
+        userId: authSession.user.id,
+      },
       success_url: `${origin}/success?session_id={CHECKOUT_SESSION_ID}`,
-      // Provide a name (for example, hosted_web_0001) to label this Checkout integration and measure its conversion independently
-      integration_identifier: '{{INTEGRATION_ID}}',
+      cancel_url: `${origin}/success?cancelled=1`,
     });
-    return NextResponse.redirect(session.url, 303)
-  } catch (err) {
+
+    if (!checkoutSession.url) {
+      return NextResponse.json(
+        { error: "Stripe did not return a checkout URL." },
+        { status: 502 },
+      );
+    }
+
+    return NextResponse.redirect(checkoutSession.url, 303);
+  } catch (error) {
+    console.error("Could not create Stripe checkout session:", error);
     return NextResponse.json(
-      { error: err.message },
-      { status: err.statusCode || 500 }
-    )
+      {
+        error:
+          error instanceof Error
+            ? error.message
+            : "Could not start the payment.",
+      },
+      { status: 500 },
+    );
   }
 }
