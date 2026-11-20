@@ -9,12 +9,16 @@ const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8000";
 type AdminBooking = {
   _id?: string;
   userId: string;
+  serviceId?: string;
   serviceName?: string;
+  servicePrice?: number;
   date: string;
   time: string;
+  message?: string;
   status: string;
   paymentStatus?: string;
   cancelledBy?: string;
+  createdAt?: string | Date;
 };
 
 type AdminUser = {
@@ -56,6 +60,19 @@ function getStatusStyle(status: string) {
     return "bg-rose-50 text-rose-700";
   }
   return "bg-amber-50 text-amber-700";
+}
+
+function formatRequestDate(value?: string | Date) {
+  if (!value) return "—";
+
+  const parsedDate = new Date(value);
+  if (Number.isNaN(parsedDate.getTime())) return "—";
+
+  return parsedDate.toLocaleDateString("en-US", {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+  });
 }
 
 export default function ManageAppointmentsPage() {
@@ -111,15 +128,18 @@ async function AppointmentsTable() {
       className="overflow-hidden rounded-2xl border border-rose-100/70 bg-white shadow-sm shadow-rose-100/40"
     >
       <div className="overflow-x-auto">
-        <table className="w-full min-w-[920px] text-left text-sm">
+        <table className="w-full min-w-[1100px] text-left text-sm">
           <thead>
             <tr className="border-b border-rose-100/70 bg-rose-50/50 text-xs text-[#8e7e86]">
               <th className="px-4 py-3 font-medium">Customer</th>
               <th className="px-4 py-3 font-medium">Service</th>
-              <th className="px-4 py-3 font-medium">Date &amp; time</th>
+              <th className="px-4 py-3 font-medium">Price</th>
+              <th className="px-4 py-3 font-medium">Appointment Date &amp; Time</th>
+              <th className="px-4 py-3 font-medium">Request Date</th>
+              <th className="px-4 py-3 font-medium">Customer Message</th>
               <th className="px-4 py-3 font-medium">Status</th>
               <th className="px-4 py-3 font-medium">Payment</th>
-              <th className="px-4 py-3 font-medium">Cancelled by</th>
+              <th className="px-4 py-3 font-medium">Cancelled By</th>
               <th className="px-4 py-3 font-medium">Actions</th>
             </tr>
           </thead>
@@ -143,11 +163,27 @@ async function AppointmentsTable() {
                       {customer?.email || appointment.userId}
                     </p>
                   </td>
-                  <td className="px-4 py-4">
+                  <td className="px-4 py-4 font-medium">
                     {appointment.serviceName || "Service"}
+                  </td>
+                  <td className="px-4 py-4 font-medium text-[#e45c78] whitespace-nowrap">
+                    {appointment.servicePrice !== undefined && appointment.servicePrice !== null
+                      ? `$${appointment.servicePrice}`
+                      : "—"}
                   </td>
                   <td className="px-4 py-4 whitespace-nowrap">
                     {appointment.date} · {appointment.time}
+                  </td>
+                  <td className="px-4 py-4 whitespace-nowrap text-xs text-[#756a72]">
+                    {formatRequestDate(appointment.createdAt)}
+                  </td>
+                  <td className="px-4 py-4 max-w-xs">
+                    <p
+                      className="line-clamp-2 text-xs text-[#756a72]"
+                      title={appointment.message || ""}
+                    >
+                      {appointment.message?.trim() ? appointment.message : "—"}
+                    </p>
                   </td>
                   <td className="px-4 py-4">
                     <span
@@ -157,9 +193,17 @@ async function AppointmentsTable() {
                     </span>
                   </td>
                   <td className="px-4 py-4">
-                    {appointment.paymentStatus || "Unpaid"}
+                    <span
+                      className={`rounded-full px-2.5 py-1 text-xs font-medium ${
+                        appointment.paymentStatus === "Paid"
+                          ? "bg-emerald-50 text-emerald-700"
+                          : "bg-gray-100 text-gray-700"
+                      }`}
+                    >
+                      {appointment.paymentStatus || "Unpaid"}
+                    </span>
                   </td>
-                  <td className="px-4 py-4 capitalize">
+                  <td className="px-4 py-4 capitalize text-xs text-[#9a8d95]">
                     {appointment.cancelledBy || "—"}
                   </td>
                   <td className="px-4 py-4">
@@ -218,7 +262,7 @@ async function AppointmentsTable() {
             })}
             {sortedAppointments.length === 0 && (
               <tr>
-                <td colSpan={7} className="px-4 py-14 text-center">
+                <td colSpan={10} className="px-4 py-14 text-center">
                   <CalendarDays
                     aria-hidden="true"
                     className="mx-auto mb-3 text-[#d3b8c0]"
