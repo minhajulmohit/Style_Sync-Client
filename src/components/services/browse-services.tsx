@@ -14,6 +14,7 @@ export default function BrowseServices() {
   const [errorMessage, setErrorMessage] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("All");
+  const [sortOrder, setSortOrder] = useState("default");
 
   useEffect(() => {
     let isCurrent = true;
@@ -65,9 +66,16 @@ export default function BrowseServices() {
     return matchesCategory && matchesQuery;
   });
 
+  if (sortOrder === "price-low") {
+    visibleServices.sort((a, b) => a.price - b.price);
+  } else if (sortOrder === "price-high") {
+    visibleServices.sort((a, b) => b.price - a.price);
+  }
+
   const clearFilters = () => {
     setSearchQuery("");
     setSelectedCategory("All");
+    setSortOrder("default");
   };
 
   return (
@@ -135,6 +143,25 @@ export default function BrowseServices() {
                 placeholder="Try haircut, facial, or massage..."
                 className="h-12 rounded-2xl border-rose-100 bg-white pl-11 text-sm shadow-sm shadow-rose-100/30 placeholder:text-[#b5a8af] focus-visible:border-rose-300 focus-visible:ring-rose-100"
               />
+            </div>
+
+            <div className="mt-4 flex flex-wrap items-center justify-between gap-2">
+              <label
+                htmlFor="service-sort"
+                className="text-sm font-medium text-[#493943]"
+              >
+                Sort by price
+              </label>
+              <select
+                id="service-sort"
+                value={sortOrder}
+                onChange={(event) => setSortOrder(event.currentTarget.value)}
+                className="h-10 rounded-xl border border-rose-100 bg-white px-3 text-sm text-[#756a72] outline-none focus-visible:border-rose-300 focus-visible:ring-3 focus-visible:ring-rose-100"
+              >
+                <option value="default">Default order</option>
+                <option value="price-low">Price: Low to high</option>
+                <option value="price-high">Price: High to low</option>
+              </select>
             </div>
 
             <div className="mt-4">

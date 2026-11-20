@@ -209,6 +209,37 @@ export default function SignupPage() {
     }
   };
 
+  const handleGoogleSignUp = async () => {
+    setIsSubmitting(true);
+
+    try {
+      const { error } = await authClient.signIn.social({
+        provider: "google",
+        callbackURL: "/dashboard",
+      });
+
+      if (error) {
+        setIsSubmitting(false);
+        toast.add({
+          type: "error",
+          title: "Google sign-up failed",
+          description: error.message,
+        });
+      }
+    } catch (error) {
+      console.error("Google sign-up failed:", error);
+      setIsSubmitting(false);
+      toast.add({
+        type: "error",
+        title: "Google sign-up failed",
+        description:
+          error instanceof Error
+            ? error.message
+            : "Something went wrong. Please try again.",
+      });
+    }
+  };
+
   return (
     <main className="flex flex-1 items-center justify-center px-4 py-12 sm:px-6 sm:py-16">
       <form
@@ -353,14 +384,9 @@ export default function SignupPage() {
         </div>
         <button
           type="button"
-          onClick={() =>
-            toast.add({
-              type: "info",
-              title: "Google sign-in is not set up yet",
-              description: "Use your email to create an account for now.",
-            })
-          }
-          className="inline-flex h-12 w-full items-center justify-center gap-3 rounded-xl border border-rose-100 bg-white font-medium text-foreground transition hover:bg-rose-50 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-primary"
+          onClick={handleGoogleSignUp}
+          disabled={isSubmitting}
+          className="inline-flex h-12 w-full items-center justify-center gap-3 rounded-xl border border-rose-100 bg-white font-medium text-foreground transition hover:bg-rose-50 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-primary disabled:pointer-events-none disabled:opacity-60"
         >
           <span
             aria-hidden="true"
@@ -368,7 +394,7 @@ export default function SignupPage() {
           >
             G
           </span>
-          Continue with Google
+          {isSubmitting ? "Connecting to Google..." : "Continue with Google"}
         </button>
 
         <p className="mt-6 text-center text-sm text-muted-foreground">
