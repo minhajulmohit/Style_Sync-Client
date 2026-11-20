@@ -9,6 +9,7 @@ import {
 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { authClient } from "@/lib/auth-client";
 import { getServiceId } from "@/lib/api/services";
@@ -20,6 +21,7 @@ import { updateService } from "@/lib/actions/services";
 import type { AddServicePayload, ServiceRecord } from "@/types/services";
 
 export function ServiceDetails({ id }: { id: string }) {
+  const router = useRouter();
   const { data: session, isPending: isSessionPending } =
     authClient.useSession();
   const [service, setService] = useState<ServiceRecord | null>(null);
@@ -28,6 +30,12 @@ export function ServiceDetails({ id }: { id: string }) {
   const [statusError, setStatusError] = useState("");
   const [isUpdatingStatus, setIsUpdatingStatus] = useState(false);
   const [isBookingOpen, setIsBookingOpen] = useState(false);
+
+  useEffect(() => {
+    if (!isSessionPending && !session) {
+      router.push("/signin");
+    }
+  }, [session, isSessionPending, router]);
 
   useEffect(() => {
     let isCurrent = true;
