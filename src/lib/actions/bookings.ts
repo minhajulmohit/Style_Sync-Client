@@ -12,6 +12,7 @@ export type BookingRecord = {
   duration?: number;
   message?: string;
   status: string;
+  cancelledBy?: string;
 };
 
 export type BookedSlot = {
@@ -64,6 +65,32 @@ export const createBooking = async (booking: NewBooking): Promise<void> => {
 
   if (!res.ok) {
     throw new Error(`Could not create booking (HTTP ${res.status}).`);
+  }
+};
+
+export const cancelBooking = async (
+  bookingId: string,
+  userId: string,
+): Promise<void> => {
+  const res = await fetch(`${baseUrl}/bookings/${bookingId}`, {
+    method: "PATCH",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      status: "Cancelled",
+      cancelledBy: "user",
+      userId,
+    }),
+  });
+
+  if (!res.ok) {
+    throw new Error(`Could not cancel booking (HTTP ${res.status}).`);
+  }
+
+  const result: { matchedCount?: number } = await res.json();
+  if (result.matchedCount === 0) {
+    throw new Error("This pending appointment could not be found.");
   }
 };
 
