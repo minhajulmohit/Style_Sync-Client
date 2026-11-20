@@ -52,7 +52,7 @@ const adminLinks = [
   {
     label: "Transactions",
     icon: BadgeDollarSign,
-    path: "/dashboard/admin/transitions",
+    path: "/dashboard/admin/transactions",
   },
   {
     label: "My Profile",
