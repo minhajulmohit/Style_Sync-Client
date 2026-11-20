@@ -14,6 +14,23 @@ type Transaction = {
   payment_date?: string | Date;
   amount_total?: number | null;
   currency?: string | null;
+  bookingId?: string;
+  serviceName?: string;
+  appointmentDate?: string;
+};
+
+type BookingInfo = {
+  _id?: string;
+  serviceName?: string;
+  date?: string;
+  time?: string;
+};
+
+type AdminUser = {
+  _id?: string;
+  id?: string;
+  name?: string;
+  email?: string;
 };
 
 async function getTransactions(): Promise<Transaction[]> {
@@ -25,6 +42,37 @@ async function getTransactions(): Promise<Transaction[]> {
 
   const transactions: Transaction[] = await response.json();
   return transactions;
+}
+
+async function getBookings(): Promise<Map<string, BookingInfo>> {
+  try {
+    const response = await authenticatedFetch(`${baseUrl}/bookings`);
+    if (!response.ok) return new Map();
+    const bookings: BookingInfo[] = await response.json();
+    const map = new Map<string, BookingInfo>();
+    for (const b of bookings) {
+      if (b._id) map.set(b._id, b);
+    }
+    return map;
+  } catch {
+    return new Map();
+  }
+}
+
+async function getUsers(): Promise<Map<string, AdminUser>> {
+  try {
+    const response = await authenticatedFetch(`${baseUrl}/users`);
+    if (!response.ok) return new Map();
+    const users: AdminUser[] = await response.json();
+    const map = new Map<string, AdminUser>();
+    for (const u of users) {
+      if (u._id) map.set(u._id, u);
+      if (u.id) map.set(u.id, u);
+    }
+    return map;
+  } catch {
+    return new Map();
+  }
 }
 
 function formatDate(value?: string | Date) {
@@ -81,7 +129,11 @@ export default function TransactionsPage() {
 }
 
 async function TransactionsTable() {
-  const transactions = await getTransactions();
+  const [transactions, bookingsMap, usersMap] = await Promise.all([
+    getTransactions(),
+    getBookings(),
+    getUsers(),
+  ]);
 
   return (
     <section
@@ -97,59 +149,75 @@ async function TransactionsTable() {
         </span>
       </div>
       <div className="overflow-x-auto">
-        <table className="w-full min-w-[880px] text-left text-sm">
+        <table className="w-full min-w-[1080px] text-left text-sm">
           <thead>
             <tr className="border-b border-rose-100/70 bg-rose-50/50 text-xs text-[#8e7e86]">
               <th className="px-4 py-3 font-medium">Customer</th>
+              <th className="px-4 py-3 font-medium">Related Service</th>
+              <th className="px-4 py-3 font-medium">Appointment Date</th>
               <th className="px-4 py-3 font-medium">Amount</th>
               <th className="px-4 py-3 font-medium">Payment intent</th>
-              <th className="px-4 py-3 font-medium">Session ID</th>
               <th className="px-4 py-3 font-medium">Payment status</th>
-              <th className="px-4 py-3 font-medium">Date</th>
+              <th className="px-4 py-3 font-medium">Payment Date</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-rose-50">
-            {transactions.map((transaction, index) => (
-              <tr
-                key={
-                  transaction._id ??
-                  transaction.sessionId ??
-                  transaction.payment_intent ??
-                  index
-                }
-                className="text-[#493943]"
-              >
-                <td className="px-4 py-4">
-                  {transaction.customer_email || transaction.userId || "—"}
-                </td>
-                <td className="px-4 py-4 whitespace-nowrap">
-                  {formatAmount(transaction.amount_total, transaction.currency)}
-                </td>
-                <td className="max-w-52 break-all px-4 py-4 text-xs">
-                  {transaction.payment_intent || "—"}
-                </td>
-                <td className="max-w-52 break-all px-4 py-4 text-xs">
-                  {transaction.sessionId || "—"}
-                </td>
-                <td className="px-4 py-4">
-                  <span
-                    className={`rounded-full px-2.5 py-1 text-xs font-medium ${
-                      transaction.payment_status?.toLowerCase() === "paid"
-                        ? "bg-emerald-50 text-emerald-700"
-                        : "bg-amber-50 text-amber-700"
-                    }`}
-                  >
-                    {transaction.payment_status || "Unknown"}
-                  </span>
-                </td>
-                <td className="px-4 py-4 whitespace-nowrap">
-                  {formatDate(transaction.payment_date)}
-                </td>
-              </tr>
-            ))}
+            {transactions.map((transaction, index) => {
+              const customer = transaction.userId ? usersMap.get(transaction.userId) : undefined;
+              const booking = transaction.bookingId ? bookingsMap.get(transaction.bookingId) : undefined;
+              const relatedService = transaction.serviceName || booking?.serviceName || (transaction.bookingId ? "Salon Service" : "—");
+              const appointmentDate = transaction.appointmentDate || (booking?.date ? `${booking.date} · ${booking.time}` : "—");
+
+              return (
+                <tr
+                  key={
+                    transaction._id ??
+                    transaction.sessionId ??
+                    transaction.payment_intent ??
+                    index
+                  }
+                  className="text-[#493943]"
+                >
+                  <td className="px-4 py-4">
+                    <p className="font-medium text-[#493943]">
+                      {customer?.name || "Customer"}
+                    </p>
+                    <p className="mt-0.5 text-xs text-[#9a8d95]">
+                      {transaction.customer_email || customer?.email || transaction.userId || "—"}
+                    </p>
+                  </td>
+                  <td className="px-4 py-4 font-medium">
+                    {relatedService}
+                  </td>
+                  <td className="px-4 py-4 whitespace-nowrap text-xs text-[#756a72]">
+                    {appointmentDate}
+                  </td>
+                  <td className="px-4 py-4 whitespace-nowrap font-medium text-[#e45c78]">
+                    {formatAmount(transaction.amount_total, transaction.currency)}
+                  </td>
+                  <td className="max-w-44 break-all px-4 py-4 text-xs text-[#756a72]">
+                    {transaction.payment_intent || "—"}
+                  </td>
+                  <td className="px-4 py-4">
+                    <span
+                      className={`rounded-full px-2.5 py-1 text-xs font-medium ${
+                        transaction.payment_status?.toLowerCase() === "paid"
+                          ? "bg-emerald-50 text-emerald-700"
+                          : "bg-amber-50 text-amber-700"
+                      }`}
+                    >
+                      {transaction.payment_status || "Unknown"}
+                    </span>
+                  </td>
+                  <td className="px-4 py-4 whitespace-nowrap text-xs text-[#756a72]">
+                    {formatDate(transaction.payment_date)}
+                  </td>
+                </tr>
+              );
+            })}
             {transactions.length === 0 && (
               <tr>
-                <td colSpan={6} className="px-4 py-14 text-center">
+                <td colSpan={7} className="px-4 py-14 text-center">
                   <BadgeDollarSign
                     aria-hidden="true"
                     className="mx-auto mb-3 text-[#d3b8c0]"
