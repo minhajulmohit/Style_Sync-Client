@@ -164,7 +164,7 @@ export default function BrowseServices() {
               </select>
             </div>
 
-            <div className="mt-4">
+            <div id="browse-by-category" className="mt-4">
               <p className="mb-2 text-xs font-semibold uppercase tracking-[0.12em] text-[#9a8d95]">
                 Browse by category
               </p>

@@ -6,42 +6,16 @@ import { LoaderCircle, Pencil } from "lucide-react"
 import Image from "next/image"
 import { Button } from "@/components/ui/button"
 import { updateService } from "@/lib/actions/services"
+import { uploadImageToImgBB } from "@/lib/api/image-upload"
 import {
   SERVICE_CATEGORIES,
   SERVICE_STATUSES,
   type AddServicePayload,
-  type ImgBBUploadResponse,
   type ServiceRecord,
 } from "@/types/services"
 
 const fieldClassName =
   "mt-2 h-10 w-full rounded-xl border border-rose-100 bg-white px-3 text-sm text-[#493943] outline-none transition focus:border-rose-300 focus:ring-4 focus:ring-rose-100"
-
-const uploadImageToImgBB = async (image: File): Promise<string> => {
-  const apiKey = process.env.NEXT_PUBLIC_IMAGEBB_API
-
-  if (!apiKey) {
-    throw new Error("Image upload is not configured.")
-  }
-
-  const formData = new FormData()
-  formData.append("image", image)
-
-  const response = await fetch(
-    `https://api.imgbb.com/1/upload?key=${apiKey}`,
-    {
-      method: "POST",
-      body: formData,
-    },
-  )
-  const result = (await response.json()) as ImgBBUploadResponse
-
-  if (!response.ok || !result.success || !result.data?.display_url) {
-    throw new Error(result.error?.message || "Image upload failed.")
-  }
-
-  return result.data.display_url
-}
 
 export function UpdateServiceButton({
   service,
@@ -68,6 +42,12 @@ export function UpdateServiceButton({
     if (!image.type.startsWith("image/")) {
       setImagePreview(null)
       setErrorMessage("Choose an image file.")
+      event.currentTarget.value = ""
+      return
+    }
+    if (image.size > 4 * 1024 * 1024) {
+      setImagePreview(null)
+      setErrorMessage("Choose an image smaller than 4 MB.")
       event.currentTarget.value = ""
       return
     }
@@ -117,7 +97,7 @@ export function UpdateServiceButton({
       !description.trim() ||
       !Number.isFinite(price) ||
       price <= 0 ||
-      !Number.isFinite(duration) ||
+      !Number.isInteger(duration) ||
       duration <= 0 ||
       !status ||
       typeof service.image !== "string"
@@ -296,8 +276,8 @@ export function UpdateServiceButton({
                   id="update-service-duration"
                   name="duration"
                   type="number"
-                  min="0.01"
-                  step="any"
+                  min="1"
+                  step="1"
                   required
                   defaultValue={service.duration}
                   className={fieldClassName}
@@ -353,7 +333,8 @@ export function UpdateServiceButton({
                       className="block w-full text-sm text-[#756a72] file:mr-3 file:rounded-lg file:border-0 file:bg-rose-50 file:px-3 file:py-2 file:text-xs file:font-medium file:text-[#d95272] hover:file:bg-rose-100"
                     />
                     <p className="mt-1 text-xs text-[#9a8d95]">
-                      Leave empty to keep the current image.
+                      Leave empty to keep the current image. New images must
+                      be 4 MB or smaller.
                     </p>
                   </div>
                 </div>

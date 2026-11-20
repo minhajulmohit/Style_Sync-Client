@@ -1,9 +1,19 @@
 "use server";
 
 import { authenticatedFetch } from "@/lib/actions/authenticated-fetch";
-import type { AddServicePayload } from "@/types/services";
+import type { AddServicePayload, ServiceRecord } from "@/types/services";
 
 const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8000";
+
+export const getAdminServices = async (): Promise<ServiceRecord[]> => {
+  const response = await authenticatedFetch(`${baseUrl}/admin/services`);
+
+  if (!response.ok) {
+    throw new Error(`Could not load admin services (HTTP ${response.status}).`);
+  }
+
+  return response.json();
+};
 
 export const addService = async (service: AddServicePayload) => {
   const response = await authenticatedFetch(`${baseUrl}/add-service`, {

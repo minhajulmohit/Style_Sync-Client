@@ -1,34 +1,100 @@
+import { Suspense } from "react";
 import {
   ArrowRight,
   CalendarDays,
   Check,
   Clock3,
-  MapPin,
   Scissors,
   Sparkles,
-} from "lucide-react"
-import { Button } from "@/components/ui/button"
+} from "lucide-react";
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
+import { authenticatedFetch } from "@/lib/actions/authenticated-fetch";
+import { auth } from "@/lib/auth";
+import { headers } from "next/headers";
 
-const appointments = [
-  {
-    day: "24",
-    month: "NOV",
-    service: "Signature Haircut & Blowout",
-    salon: "The Rose Studio",
-    time: "Monday · 10:30 AM",
-    status: "Confirmed",
-  },
-  {
-    day: "02",
-    month: "DEC",
-    service: "Glow & Go Facial",
-    salon: "The Rose Studio",
-    time: "Tuesday · 2:00 PM",
-    status: "Pending",
-  },
-]
+const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8000";
+
+type CustomerBooking = {
+  _id?: string;
+  serviceName?: string;
+  date: string;
+  time: string;
+  status: string;
+};
+
+function toLocalDateString(date: Date) {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+}
+
+function formatTime(value: string) {
+  const [hours, minutes] = value.split(":").map(Number);
+  if (!Number.isInteger(hours) || !Number.isInteger(minutes)) return value;
+
+  return new Date(2000, 0, 1, hours, minutes).toLocaleTimeString("en-US", {
+    hour: "numeric",
+    minute: "2-digit",
+  });
+}
+
+function formatAppointmentDate(date: string, time: string) {
+  const parsedDate = new Date(`${date}T00:00:00`);
+  const dateLabel = Number.isNaN(parsedDate.getTime())
+    ? date
+    : parsedDate.toLocaleDateString("en-US", {
+        weekday: "long",
+        month: "short",
+        day: "numeric",
+        year: "numeric",
+      });
+
+  return `${dateLabel} · ${formatTime(time)}`;
+}
 
 export default function CustomerDashboardPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="px-6 py-10 text-sm text-[#8e7e86]">
+          Loading your appointments...
+        </div>
+      }
+    >
+      <CustomerDashboardData />
+    </Suspense>
+  );
+}
+
+async function CustomerDashboardData() {
+  const [session, response] = await Promise.all([
+    auth.api.getSession({ headers: await headers() }),
+    authenticatedFetch(`${baseUrl}/bookings`),
+  ]);
+
+  if (!response.ok) {
+    throw new Error(`Could not load appointments (HTTP ${response.status}).`);
+  }
+
+  const bookings: CustomerBooking[] = await response.json();
+  const today = toLocalDateString(new Date());
+  const upcomingAppointments = bookings
+    .filter(
+      (booking) =>
+        booking.date >= today &&
+        (booking.status === "Pending" || booking.status === "Confirmed"),
+    )
+    .sort(
+      (first, second) =>
+        `${first.date} ${first.time}`.localeCompare(
+          `${second.date} ${second.time}`,
+        ),
+    );
+  const nextAppointment = upcomingAppointments[0];
+  const userName = session?.user.name || "there";
+
   return (
     <div className="min-h-full bg-[#fffaf8] px-4 pb-10 pt-7 sm:px-7 lg:px-10">
       <div className="mx-auto max-w-7xl">
@@ -37,7 +103,7 @@ export default function CustomerDashboardPage() {
             Your personal space
           </p>
           <h1 className="font-heading text-2xl font-semibold tracking-tight text-[#352a31] sm:text-3xl">
-            Welcome back, there <span aria-hidden="true">✦</span>
+            Welcome back, {userName} <span aria-hidden="true">✦</span>
           </h1>
           <p className="mt-2 text-sm text-[#8e7e86]">
             A little time for yourself looks good on you.
@@ -50,34 +116,54 @@ export default function CustomerDashboardPage() {
           <div className="relative grid gap-8 md:grid-cols-[1fr_auto] md:items-center">
             <div>
               <span className="inline-flex items-center gap-2 rounded-full bg-white/15 px-3 py-1.5 text-xs font-medium text-white/90 backdrop-blur">
-                <Sparkles size={14} />
+                <Sparkles aria-hidden="true" size={14} />
                 Your next appointment
               </span>
               <h2 className="mt-5 max-w-lg font-heading text-2xl font-semibold tracking-tight sm:text-3xl">
-                Make room for a little me-time.
+                {nextAppointment
+                  ? nextAppointment.serviceName || "Your upcoming visit"
+                  : "Make room for a little me-time."}
               </h2>
               <p className="mt-2 text-sm text-white/80">
-                Your Signature Haircut &amp; Blowout is coming up soon.
+                {nextAppointment
+                  ? formatAppointmentDate(
+                      nextAppointment.date,
+                      nextAppointment.time,
+                    )
+                  : "You have no upcoming appointments right now."}
               </p>
-              <Button className="mt-6 h-10 rounded-xl bg-white px-4 font-semibold text-[#d64f70] shadow-sm hover:bg-white/90">
-                View appointment <ArrowRight />
+              <Button
+                render={
+                  <Link href="/dashboard/customer/my-appointments" />
+                }
+                className="mt-6 h-10 rounded-xl bg-white px-4 font-semibold text-[#d64f70] shadow-sm hover:bg-white/90"
+              >
+                View appointments <ArrowRight />
               </Button>
             </div>
-            <div className="flex items-center gap-4 rounded-2xl border border-white/20 bg-white/10 p-4 backdrop-blur-sm md:min-w-64">
-              <div className="flex size-14 shrink-0 flex-col items-center justify-center rounded-xl bg-white text-[#df5574]">
-                <span className="text-[10px] font-bold tracking-widest">NOV</span>
-                <span className="font-heading text-2xl font-semibold leading-6">24</span>
+            {nextAppointment && (
+              <div className="flex items-center gap-4 rounded-2xl border border-white/20 bg-white/10 p-4 backdrop-blur-sm md:min-w-64">
+                <div className="flex size-14 shrink-0 flex-col items-center justify-center rounded-xl bg-white text-[#df5574]">
+                  <span className="text-[10px] font-bold tracking-widest">
+                    {new Date(
+                      `${nextAppointment.date}T00:00:00`,
+                    ).toLocaleDateString("en-US", { month: "short" })}
+                  </span>
+                  <span className="font-heading text-2xl font-semibold leading-6">
+                    {new Date(
+                      `${nextAppointment.date}T00:00:00`,
+                    ).getDate()}
+                  </span>
+                </div>
+                <div>
+                  <p className="font-semibold">StyleSync</p>
+                  <p className="mt-1 flex items-center gap-1.5 text-xs text-white/80">
+                    <Clock3 size={13} />
+                    {formatTime(nextAppointment.time)}
+                  </p>
+                </div>
               </div>
-              <div>
-                <p className="font-semibold">The Rose Studio</p>
-                <p className="mt-1 flex items-center gap-1.5 text-xs text-white/80">
-                  <Clock3 size={13} /> Monday · 10:30 AM
-                </p>
-                <p className="mt-1 flex items-center gap-1.5 text-xs text-white/80">
-                  <MapPin size={13} /> Downtown
-                </p>
-              </div>
-            </div>
+            )}
           </div>
         </section>
 
@@ -89,35 +175,43 @@ export default function CustomerDashboardPage() {
                   My Appointments
                 </h2>
                 <p className="mt-1 text-xs text-[#9a8d95]">
-                  Keep track of your upcoming salon visits
+                  Your upcoming salon visits
                 </p>
               </div>
               <span className="rounded-full bg-rose-50 px-3 py-1 text-xs font-medium text-[#e45c78]">
-                2 upcoming
+                {upcomingAppointments.length} upcoming
               </span>
             </div>
             <div className="divide-y divide-rose-50">
-              {appointments.map((appointment) => (
+              {upcomingAppointments.slice(0, 4).map((appointment, index) => (
                 <article
-                  key={appointment.service}
+                  key={
+                    appointment._id ??
+                    `${appointment.date}-${appointment.time}-${index}`
+                  }
                   className="flex flex-wrap items-center gap-4 px-5 py-5 sm:px-6"
                 >
                   <div className="flex size-14 shrink-0 flex-col items-center justify-center rounded-2xl bg-[#fff3f2] text-[#e45c78]">
                     <span className="text-[10px] font-bold tracking-widest">
-                      {appointment.month}
+                      {new Date(`${appointment.date}T00:00:00`)
+                        .toLocaleDateString("en-US", { month: "short" })
+                        .toUpperCase()}
                     </span>
                     <span className="font-heading text-xl font-semibold leading-5">
-                      {appointment.day}
+                      {new Date(`${appointment.date}T00:00:00`).getDate()}
                     </span>
                   </div>
                   <div className="min-w-40 flex-1">
                     <h3 className="text-sm font-semibold text-[#493943]">
-                      {appointment.service}
+                      {appointment.serviceName || "Salon service"}
                     </h3>
-                    <p className="mt-1 text-xs text-[#9a8d95]">{appointment.salon}</p>
+                    <p className="mt-1 text-xs text-[#9a8d95]">StyleSync</p>
                     <p className="mt-2 flex items-center gap-1.5 text-xs text-[#756a72]">
                       <CalendarDays size={13} className="text-[#e77a8e]" />
-                      {appointment.time}
+                      {formatAppointmentDate(
+                        appointment.date,
+                        appointment.time,
+                      )}
                     </p>
                   </div>
                   <span
@@ -130,16 +224,22 @@ export default function CustomerDashboardPage() {
                     {appointment.status === "Confirmed" && <Check size={12} />}
                     {appointment.status}
                   </span>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    aria-label={`View ${appointment.service}`}
-                    className="rounded-xl text-[#a898a0] hover:bg-rose-50 hover:text-[#e45c78]"
-                  >
-                    <ArrowRight />
-                  </Button>
                 </article>
               ))}
+              {upcomingAppointments.length === 0 && (
+                <div className="px-5 py-10 text-center">
+                  <p className="font-medium text-[#493943]">
+                    No upcoming appointments
+                  </p>
+                  <Button
+                    render={<Link href="/services" />}
+                    variant="ghost"
+                    className="mt-2 text-[#df5574]"
+                  >
+                    Browse services <ArrowRight />
+                  </Button>
+                </div>
+              )}
             </div>
           </section>
 
@@ -152,12 +252,13 @@ export default function CustomerDashboardPage() {
                 Your beauty routine
               </h2>
               <p className="mt-1 text-sm leading-6 text-[#8e7e86]">
-                You&apos;ve had 6 appointments with us. Thanks for making us part
-                of your self-care!
+                Your appointment history is ready whenever you need it.
               </p>
               <div className="mt-5 flex items-center justify-between border-t border-rose-50 pt-4">
                 <span className="text-xs text-[#9a8d95]">Appointments made</span>
-                <span className="font-heading text-lg font-semibold text-[#493943]">06</span>
+                <span className="font-heading text-lg font-semibold text-[#493943]">
+                  {bookings.length}
+                </span>
               </div>
             </section>
 
@@ -169,9 +270,13 @@ export default function CustomerDashboardPage() {
                 Your next glow-up?
               </h2>
               <p className="mt-1 text-sm leading-6 text-[#8e7e86]">
-                Explore services picked just for you and find your next favorite.
+                Explore available services and find your next favorite.
               </p>
-              <Button variant="ghost" className="mt-3 h-9 rounded-xl px-0 text-sm font-semibold text-[#df5574] hover:bg-transparent hover:text-[#c94162]">
+              <Button
+                render={<Link href="/services" />}
+                variant="ghost"
+                className="mt-3 h-9 rounded-xl px-0 text-sm font-semibold text-[#df5574] hover:bg-transparent hover:text-[#c94162]"
+              >
                 Explore services <ArrowRight />
               </Button>
             </section>
@@ -179,5 +284,5 @@ export default function CustomerDashboardPage() {
         </div>
       </div>
     </div>
-  )
+  );
 }

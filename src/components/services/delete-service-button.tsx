@@ -18,9 +18,11 @@ import { deleteService } from "@/lib/actions/services";
 export function DeleteServiceButton({
   serviceId,
   serviceName,
+  onDeleted,
 }: {
   serviceId: string;
   serviceName: string;
+  onDeleted?: () => void;
 }) {
   const router = useRouter();
   const [isOpen, setIsOpen] = useState(false);
@@ -37,8 +39,13 @@ export function DeleteServiceButton({
 
     try {
       await deleteService(serviceId);
-      router.push("/dashboard/admin/manage-services");
-      router.refresh();
+      if (onDeleted) {
+        setIsOpen(false);
+        onDeleted();
+      } else {
+        router.push("/dashboard/admin/manage-services");
+        router.refresh();
+      }
     } catch (error) {
       console.error("Could not delete service:", error);
       setErrorMessage(

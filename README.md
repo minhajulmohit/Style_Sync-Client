@@ -1,36 +1,54 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# StyleSync Client
 
-## Getting Started
+StyleSync is a salon booking application built with Next.js, React, TypeScript,
+Tailwind CSS, Better Auth, and Stripe.
 
-First, run the development server:
+## Local development
+
+Install dependencies and start the development server:
 
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+The client runs at `http://localhost:3000` by default. The Express API runs
+separately from the `stylesync-server` repository.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Environment variables
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Set these in a local `.env.local` file. Do not commit credentials.
 
-## Learn More
+| Variable | Purpose |
+| --- | --- |
+| `BETTER_AUTH_URL` | Base URL for the Better Auth API |
+| `BETTER_AUTH_SECRET` | Better Auth session and token signing secret |
+| `MONGODB_URL` | MongoDB connection string |
+| `GOOGLE_CLIENT_ID` | Google OAuth client ID |
+| `GOOGLE_CLIENT_SECRET` | Google OAuth client secret |
+| `NEXT_PUBLIC_API_BASE_URL` | Base URL of the Express API |
+| `IMAGEBB_API` | Server-side ImgBB image-upload API key |
+| `STRIPE_SECRET_KEY` | Server-side Stripe API secret |
+| `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY` | Stripe publishable key |
 
-To learn more about Next.js, take a look at the following resources:
+`NEXT_PUBLIC_` variables are available to browser code. Do not put secret
+credentials behind that prefix. Older local configurations using
+`NEXT_PUBLIC_IMAGEBB_API` remain supported server-side; rename that key to
+`IMAGEBB_API` and rotate it if it was previously exposed in a browser bundle.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Main routes
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+- `/` — home page, service categories, and featured services
+- `/services` — service search, category filter, and price sorting
+- `/services/[id]` — service details and booking
+- `/signin` and `/signup` — email/password and Google authentication
+- `/dashboard/customer` — customer dashboard and appointments
+- `/dashboard/admin` — admin dashboard and management pages
+- `/success` — Stripe checkout result
 
-## Deploy on Vercel
+## Checks
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+```bash
+npm run lint
+npm run build
+```

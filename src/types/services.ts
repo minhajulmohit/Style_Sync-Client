@@ -28,13 +28,3 @@ export type ServiceRecord = AddServicePayload & {
   id?: string
   _id?: string
 }
-
-export type ImgBBUploadResponse = {
-  success: boolean
-  data?: {
-    display_url: string
-  }
-  error?: {
-    message?: string
-  }
-}

@@ -30,7 +30,8 @@ export async function POST(request: Request) {
       return NextResponse.redirect(new URL("/signin", request.url), 303);
     }
 
-    if (authSession.user.role?.toLowerCase() !== "customer") {
+    const userRole = authSession.user.role?.toLowerCase();
+    if (userRole !== "customer" && userRole !== "user") {
       return NextResponse.json(
         { error: "Only customers can pay for appointments." },
         { status: 403 },

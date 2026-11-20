@@ -6,33 +6,14 @@ import Image from "next/image";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { addService } from "@/lib/actions/services";
+import { uploadImageToImgBB } from "@/lib/api/image-upload";
 import {
   SERVICE_CATEGORIES,
   SERVICE_STATUSES,
-  type ImgBBUploadResponse,
 } from "@/types/services";
 
 const fieldClassName =
   "mt-2 h-11 w-full rounded-xl border border-rose-100 bg-white px-3.5 text-sm text-[#493943] outline-none transition placeholder:text-[#b5a8af] focus:border-rose-300 focus:ring-4 focus:ring-rose-100";
-
-const uploadImageToImgBB = async (image: File): Promise<string> => {
-  const apiKey = process.env.NEXT_PUBLIC_IMAGEBB_API;
-
-  const formData = new FormData();
-  formData.append("image", image);
-
-  const response = await fetch(`https://api.imgbb.com/1/upload?key=${apiKey}`, {
-    method: "POST",
-    body: formData,
-  });
-  const result = (await response.json()) as ImgBBUploadResponse;
-
-  if (!response.ok || !result.success || !result.data?.display_url) {
-    throw new Error(result.error?.message || "Image upload failed.");
-  }
-
-  return result.data.display_url;
-};
 
 export default function AddServicePage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -51,6 +32,12 @@ export default function AddServicePage() {
     if (!image.type.startsWith("image/")) {
       setImagePreview(null);
       setErrorMessage("Choose an image file to continue.");
+      event.currentTarget.value = "";
+      return;
+    }
+    if (image.size > 4 * 1024 * 1024) {
+      setImagePreview(null);
+      setErrorMessage("Choose an image smaller than 4 MB.");
       event.currentTarget.value = "";
       return;
     }
@@ -100,7 +87,7 @@ export default function AddServicePage() {
       !description.trim() ||
       !Number.isFinite(price) ||
       price <= 0 ||
-      !Number.isFinite(duration) ||
+      !Number.isInteger(duration) ||
       duration <= 0 ||
       !(image instanceof File) ||
       image.size === 0 ||
@@ -273,8 +260,8 @@ export default function AddServicePage() {
                   id="duration"
                   name="duration"
                   type="number"
-                  min="0.01"
-                  step="any"
+                  min="1"
+                  step="1"
                   required
                   placeholder="e.g. 45"
                   className={`${fieldClassName} pr-16`}
@@ -335,7 +322,7 @@ export default function AddServicePage() {
                     : "Choose an image to upload"}
                 </span>
                 <span className="mt-1 text-xs text-[#9a8d95]">
-                  JPG, PNG, or another image format
+                  JPG, PNG, or another image format, up to 4 MB
                 </span>
                 <input
                   id="image"

@@ -12,5 +12,11 @@ export async function getDashboardRole(): Promise<"admin" | "customer" | null> {
     .split(",")
     .map((role) => role.trim().toLowerCase())
 
-  return roles.includes("admin") ? "admin" : "customer"
+  if (roles.includes("admin")) {
+    return "admin"
+  }
+
+  return roles.includes("customer") || roles.includes("user")
+    ? "customer"
+    : null
 }

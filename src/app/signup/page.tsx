@@ -3,6 +3,7 @@
 import { FieldGroup, FieldSet } from "@/components/ui/field";
 import { toast } from "@/components/ui/toast";
 import { authClient } from "@/lib/auth-client";
+import { uploadImageToImgBB } from "@/lib/api/image-upload";
 import { Field, Input } from "@base-ui/react";
 import {
   ArrowRight,
@@ -17,16 +18,6 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 
 import { useState, type ChangeEvent, type FormEvent } from "react";
-
-interface ImgBBUploadResponse {
-  success: boolean;
-  data?: {
-    display_url: string;
-  };
-  error?: {
-    message?: string;
-  };
-}
 
 export default function SignupPage() {
   const router = useRouter();
@@ -52,12 +43,12 @@ export default function SignupPage() {
       return;
     }
 
-    if (imageFile.size > 32 * 1024 * 1024) {
+    if (imageFile.size > 4 * 1024 * 1024) {
       setImagePreview(null);
       toast.add({
         type: "error",
         title: "Image is too large",
-        description: "Choose an image smaller than 32 MB.",
+        description: "Choose an image smaller than 4 MB.",
       });
       event.currentTarget.value = "";
       return;
@@ -80,28 +71,6 @@ export default function SignupPage() {
     };
 
     reader.readAsDataURL(imageFile);
-  };
-
-  const uploadImageToImgBB = async (imageFile: File): Promise<string> => {
-    const apiKey = process.env.NEXT_PUBLIC_IMAGEBB_API;
-
-    const uploadData = new FormData();
-    uploadData.append("image", imageFile);
-
-    const response = await fetch(
-      `https://api.imgbb.com/1/upload?key=${apiKey}`,
-      {
-        method: "POST",
-        body: uploadData,
-      },
-    );
-    const result = (await response.json()) as ImgBBUploadResponse;
-
-    if (!response.ok || !result.success || !result.data?.display_url) {
-      throw new Error(result.error?.message ?? "Image upload failed.");
-    }
-
-    return result.data.display_url;
   };
 
   const onSubmit = async (e: FormEvent<HTMLFormElement>): Promise<void> => {
@@ -292,7 +261,7 @@ export default function SignupPage() {
               className="sr-only"
             />
             <p className="mt-3 text-xs text-muted-foreground">
-              Upload a profile photo
+              Upload a profile photo (up to 4 MB)
             </p>
           </div>
 

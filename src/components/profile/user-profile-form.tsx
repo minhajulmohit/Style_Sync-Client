@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "@/components/ui/toast";
 import { authClient } from "@/lib/auth-client";
+import { uploadImageToImgBB } from "@/lib/api/image-upload";
 import {
   Camera,
   Check,
@@ -18,16 +19,6 @@ import {
 import Image from "next/image";
 import { useState, type ChangeEvent, type FormEvent } from "react";
 
-interface ImgBBUploadResponse {
-  success: boolean;
-  data?: {
-    display_url: string;
-  };
-  error?: {
-    message?: string;
-  };
-}
-
 export function UserProfileForm() {
   const {
     data: session,
@@ -37,27 +28,6 @@ export function UserProfileForm() {
   } = authClient.useSession();
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [isSaving, setIsSaving] = useState(false);
-
-  const uploadImageToImgBB = async (imageFile: File): Promise<string> => {
-    const apiKey = process.env.NEXT_PUBLIC_IMAGEBB_API;
-    if (!apiKey) {
-      throw new Error("Profile image uploads are not configured.");
-    }
-
-    const uploadData = new FormData();
-    uploadData.append("image", imageFile);
-    const response = await fetch(
-      `https://api.imgbb.com/1/upload?key=${apiKey}`,
-      { method: "POST", body: uploadData },
-    );
-    const result = (await response.json()) as ImgBBUploadResponse;
-
-    if (!response.ok || !result.success || !result.data?.display_url) {
-      throw new Error(result.error?.message ?? "Image upload failed.");
-    }
-
-    return result.data.display_url;
-  };
 
   const handleImageChange = (event: ChangeEvent<HTMLInputElement>) => {
     const imageFile = event.target.files?.[0];
@@ -77,13 +47,13 @@ export function UserProfileForm() {
       return;
     }
 
-    if (imageFile.size > 32 * 1024 * 1024) {
+    if (imageFile.size > 4 * 1024 * 1024) {
       event.target.value = "";
       setImagePreview(null);
       toast.add({
         type: "error",
         title: "Image is too large",
-        description: "Choose an image smaller than 32 MB.",
+        description: "Choose an image smaller than 4 MB.",
       });
       return;
     }
@@ -271,7 +241,7 @@ export function UserProfileForm() {
           />
           <p className="mt-2 flex items-center gap-1.5 text-xs text-[#9a8d95]">
             <ImagePlus aria-hidden="true" size={13} />
-            JPG, PNG, or another image format (up to 32 MB)
+            JPG, PNG, or another image format (up to 4 MB)
           </p>
         </div>
       </section>
