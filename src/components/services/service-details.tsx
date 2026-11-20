@@ -15,6 +15,7 @@ import { getServiceId } from "@/lib/api/services";
 import { DeleteServiceButton } from "@/components/services/delete-service-button";
 import { ServiceStatusToggle } from "@/components/services/service-status-toggle";
 import { UpdateServiceButton } from "@/components/services/update-service-button";
+import { BookingDialog } from "@/components/services/booking-dialog";
 import { updateService } from "@/lib/actions/services";
 import type { AddServicePayload, ServiceRecord } from "@/types/services";
 
@@ -26,6 +27,7 @@ export function ServiceDetails({ id }: { id: string }) {
   const [errorMessage, setErrorMessage] = useState("");
   const [statusError, setStatusError] = useState("");
   const [isUpdatingStatus, setIsUpdatingStatus] = useState(false);
+  const [isBookingOpen, setIsBookingOpen] = useState(false);
 
   useEffect(() => {
     let isCurrent = true;
@@ -220,6 +222,7 @@ export function ServiceDetails({ id }: { id: string }) {
                     ) : (
                       <Button
                         type="button"
+                        onClick={() => setIsBookingOpen(true)}
                         className="mt-7 h-11 w-full rounded-xl gradient-surface shadow-md shadow-rose-200/50 hover:opacity-90"
                       >
                         <CalendarPlus aria-hidden="true" />
@@ -237,6 +240,14 @@ export function ServiceDetails({ id }: { id: string }) {
                 </div>
               </div>
             </div>
+            {isBookingOpen && (
+              <BookingDialog
+                service={service}
+                serviceId={service.id ?? service._id ?? id}
+                userId={session?.user.id}
+                onClose={() => setIsBookingOpen(false)}
+              />
+            )}
           </>
         )}
       </div>

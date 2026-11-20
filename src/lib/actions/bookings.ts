@@ -2,7 +2,29 @@
 
 const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8000";
 
-export const getBookings = async (query = ""): Promise<unknown[]> => {
+export type BookingRecord = {
+  _id?: string;
+  userId: string;
+  serviceId: string;
+  serviceName?: string;
+  date: string;
+  time: string;
+  duration?: number;
+  message?: string;
+  status: string;
+};
+
+export type BookedSlot = {
+  time: string;
+  duration: number;
+};
+
+type NewBooking = Pick<
+  BookingRecord,
+  "userId" | "serviceId" | "date" | "time" | "message"
+>;
+
+export const getBookings = async (query = ""): Promise<BookingRecord[]> => {
   const res = await fetch(`${baseUrl}/bookings?${query}`);
 
   if (!res.ok) {
@@ -10,6 +32,39 @@ export const getBookings = async (query = ""): Promise<unknown[]> => {
   }
 
   return res.json();
+};
+
+export const getBookedSlots = async (
+  serviceId: string,
+  date: string,
+): Promise<BookedSlot[]> => {
+  const query = new URLSearchParams({ serviceId, date });
+  const res = await fetch(`${baseUrl}/bookings/availability?${query}`);
+
+  if (!res.ok) {
+    throw new Error(`Could not load available times (HTTP ${res.status}).`);
+  }
+
+  const result: { bookedSlots: BookedSlot[] } = await res.json();
+  return result.bookedSlots;
+};
+
+export const createBooking = async (booking: NewBooking): Promise<void> => {
+  const res = await fetch(`${baseUrl}/bookings`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(booking),
+  });
+
+  if (res.status === 409) {
+    throw new Error("This time overlaps an existing booking. Choose another time.");
+  }
+
+  if (!res.ok) {
+    throw new Error(`Could not create booking (HTTP ${res.status}).`);
+  }
 };
 
 export const getBookingsCount = async (
