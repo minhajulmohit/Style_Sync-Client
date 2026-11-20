@@ -125,7 +125,7 @@ export function DashboardSidebar() {
               {links.map(({ label, icon: Icon, path }) => (
                 <SidebarMenuItem key={label}>
                   <SidebarMenuButton
-                    render={isAdmin ? <Link href={path} /> : undefined}
+                    render={<Link href={path} />}
                     isActive={
                       pathname === path ||
                       (label !== "Overview" && pathname.startsWith(`${path}/`))

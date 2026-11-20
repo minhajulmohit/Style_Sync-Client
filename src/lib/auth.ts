@@ -10,6 +10,15 @@ const client = new MongoClient(process.env.MONGODB_URL as string);
 const db = client.db("StyleSync");
 
 export const auth = betterAuth({
+  user: {
+    additionalFields: {
+      phone: {
+        type: "string",
+        required: false,
+        input: true,
+      },
+    },
+  },
   emailAndPassword: {
     enabled: true,
     minPasswordLength: 6,
