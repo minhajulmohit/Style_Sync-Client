@@ -28,7 +28,7 @@ export default function ServiceCategories() {
           {SERVICE_CATEGORIES.map((category) => (
             <Link
               key={category}
-              href="/services#browse-by-category"
+              href={`/services?category=${encodeURIComponent(category)}`}
               className="group flex min-h-24 items-center justify-between gap-3 rounded-2xl border border-rose-100 bg-[#fffaf8] p-4 transition hover:-translate-y-0.5 hover:border-rose-200 hover:shadow-md hover:shadow-rose-100/50"
             >
               <span className="flex items-center gap-3">

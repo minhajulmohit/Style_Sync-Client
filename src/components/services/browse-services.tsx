@@ -1,19 +1,26 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import { Search, Scissors, Sparkles } from "lucide-react";
 import { ServiceCard } from "@/components/services/service-card";
 import { Input } from "@/components/ui/input";
 import { getServices } from "@/lib/api/services";
 import { formatServiceCategory } from "@/lib/utils";
-import type { ServiceRecord } from "@/types/services";
+import { SERVICE_CATEGORIES, type ServiceRecord } from "@/types/services";
 
 export default function BrowseServices() {
+  const searchParams = useSearchParams();
+  const categoryFromUrl = searchParams.get("category");
   const [services, setServices] = useState<ServiceRecord[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [errorMessage, setErrorMessage] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
-  const [selectedCategory, setSelectedCategory] = useState("All");
+  const [selectedCategory, setSelectedCategory] = useState(() =>
+    SERVICE_CATEGORIES.find(
+      (category) => formatServiceCategory(category) === categoryFromUrl,
+    ) ?? "All",
+  );
   const [sortOrder, setSortOrder] = useState("default");
 
   useEffect(() => {
