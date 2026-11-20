@@ -127,13 +127,24 @@ export default function ManageServicesPage() {
         </div>
 
         {isLoading ? (
-          <div className="flex min-h-56 flex-col items-center justify-center rounded-2xl border border-rose-100/70 bg-white text-sm text-[#8e7e86]">
-            <LoaderCircle
-              aria-hidden="true"
-              className="mb-3 animate-spin text-[#e45c78]"
-              size={24}
-            />
-            Loading services...
+          <div className="overflow-hidden rounded-2xl border border-rose-100/70 bg-white p-6 shadow-sm shadow-rose-100/40">
+            <div className="space-y-4">
+              {Array.from({ length: 5 }).map((_, i) => (
+                <div key={i} className="flex items-center gap-4 py-3 border-b border-rose-50 last:border-0">
+                  <div className="size-12 animate-pulse rounded-xl bg-rose-100/70 shrink-0" />
+                  <div className="flex-1 space-y-2">
+                    <div className="h-4 w-40 animate-pulse rounded bg-rose-100/70" />
+                    <div className="h-3 w-64 animate-pulse rounded bg-rose-100/70" />
+                  </div>
+                  <div className="h-4 w-20 animate-pulse rounded bg-rose-100/70" />
+                  <div className="h-6 w-16 animate-pulse rounded-full bg-rose-100/70" />
+                  <div className="flex gap-2">
+                    <div className="size-8 animate-pulse rounded-lg bg-rose-100/70" />
+                    <div className="size-8 animate-pulse rounded-lg bg-rose-100/70" />
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
         ) : errorMessage ? (
           <div

@@ -32,8 +32,23 @@ export default function ManageUsersPage() {
         </header>
         <Suspense
           fallback={
-            <div className="rounded-2xl border border-rose-100/70 bg-white p-8 text-center text-sm text-[#8e7e86]">
-              Loading users...
+            <div className="overflow-hidden rounded-2xl border border-rose-100/70 bg-white p-6 shadow-sm shadow-rose-100/40">
+              <div className="space-y-4">
+                {Array.from({ length: 5 }).map((_, i) => (
+                  <div key={i} className="flex items-center justify-between gap-4 py-3 border-b border-rose-50 last:border-0">
+                    <div className="flex items-center gap-3">
+                      <div className="size-10 animate-pulse rounded-full bg-rose-100/70" />
+                      <div className="space-y-1.5">
+                        <div className="h-4 w-32 animate-pulse rounded bg-rose-100/70" />
+                        <div className="h-3 w-48 animate-pulse rounded bg-rose-100/70" />
+                      </div>
+                    </div>
+                    <div className="h-6 w-20 animate-pulse rounded-full bg-rose-100/70" />
+                    <div className="h-6 w-16 animate-pulse rounded-full bg-rose-100/70" />
+                    <div className="size-8 animate-pulse rounded-lg bg-rose-100/70" />
+                  </div>
+                ))}
+              </div>
             </div>
           }
         >

@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { ReviewsSkeleton } from "@/components/skeletons";
 import {
   Carousel,
   CarouselContent,
@@ -59,13 +60,7 @@ export default function CustomerReviews() {
   };
 
   if (isLoading) {
-    return (
-      <section className="py-16 bg-rose-50">
-        <div className="max-w-6xl mx-auto px-4 text-center">
-          <p className="text-rose-400 text-sm">Loading reviews...</p>
-        </div>
-      </section>
-    );
+    return <ReviewsSkeleton />;
   }
 
   if (errorMessage) {

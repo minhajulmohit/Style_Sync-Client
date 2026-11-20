@@ -560,8 +560,27 @@ export default function MyAppointmentsPage() {
           </div>
 
           {isLoading ? (
-            <div className="flex min-h-56 items-center justify-center text-sm text-[#8e7e86]">
-              Loading your appointments...
+            <div className="divide-y divide-rose-50">
+              {Array.from({ length: 4 }).map((_, i) => (
+                <div
+                  key={i}
+                  className="flex flex-wrap items-center justify-between gap-4 p-5 sm:p-6"
+                >
+                  <div className="flex items-center gap-4">
+                    <div className="size-16 animate-pulse rounded-2xl bg-rose-100/70" />
+                    <div className="space-y-2">
+                      <div className="h-5 w-44 animate-pulse rounded bg-rose-100/70" />
+                      <div className="h-3 w-32 animate-pulse rounded bg-rose-100/70" />
+                      <div className="h-4 w-24 animate-pulse rounded bg-rose-100/70" />
+                    </div>
+                  </div>
+                  <div className="flex flex-wrap items-center gap-3">
+                    <div className="h-7 w-20 animate-pulse rounded-full bg-rose-100/70" />
+                    <div className="h-7 w-16 animate-pulse rounded-full bg-rose-100/70" />
+                    <div className="h-9 w-20 animate-pulse rounded-xl bg-rose-100/70" />
+                  </div>
+                </div>
+              ))}
             </div>
           ) : pageError ? (
             <p

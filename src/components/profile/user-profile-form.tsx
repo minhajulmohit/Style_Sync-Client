@@ -18,6 +18,7 @@ import {
 } from "lucide-react";
 import Image from "next/image";
 import { useState, type ChangeEvent, type FormEvent } from "react";
+import { ProfileFormSkeleton } from "@/components/skeletons";
 
 export function UserProfileForm() {
   const {
@@ -146,12 +147,7 @@ export function UserProfileForm() {
   };
 
   if (isPending) {
-    return (
-      <div className="flex min-h-64 items-center justify-center gap-3 text-sm text-[#8e7e86]">
-        <LoaderCircle aria-hidden="true" className="animate-spin" size={18} />
-        Loading your profile...
-      </div>
-    );
+    return <ProfileFormSkeleton />;
   }
 
   if (sessionError || !session) {

@@ -119,8 +119,29 @@ export function ServiceDetails({ id }: { id: string }) {
         </Link>
 
         {isLoading || isSessionPending ? (
-          <div className="flex min-h-64 items-center justify-center rounded-2xl border border-rose-100/70 bg-white text-sm text-[#8e7e86]">
-            Loading service details...
+          <div className="overflow-hidden rounded-3xl border border-rose-100/70 bg-white shadow-md shadow-rose-100/40">
+            <div className="aspect-21/9 w-full animate-pulse bg-rose-100/70" />
+            <div className="p-6 sm:p-8 space-y-6">
+              <div className="flex flex-wrap items-start justify-between gap-4">
+                <div className="space-y-3">
+                  <div className="h-5 w-24 animate-pulse rounded-full bg-rose-100/70" />
+                  <div className="h-9 w-64 animate-pulse rounded bg-rose-100/70" />
+                  <div className="flex items-center gap-4">
+                    <div className="h-4 w-24 animate-pulse rounded bg-rose-100/70" />
+                    <div className="h-4 w-20 animate-pulse rounded bg-rose-100/70" />
+                  </div>
+                </div>
+                <div className="h-10 w-28 animate-pulse rounded bg-rose-100/70" />
+              </div>
+              <div className="space-y-2 border-t border-rose-50 pt-5">
+                <div className="h-4 w-full animate-pulse rounded bg-rose-100/70" />
+                <div className="h-4 w-5/6 animate-pulse rounded bg-rose-100/70" />
+                <div className="h-4 w-3/4 animate-pulse rounded bg-rose-100/70" />
+              </div>
+              <div className="flex gap-3 border-t border-rose-50 pt-6">
+                <div className="h-11 w-44 animate-pulse rounded-xl bg-rose-100/70" />
+              </div>
+            </div>
           </div>
         ) : errorMessage ? (
           <p

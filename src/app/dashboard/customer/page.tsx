@@ -1,4 +1,5 @@
 import { Suspense } from "react";
+import { CustomerOverviewSkeleton } from "@/components/skeletons";
 import {
   ArrowRight,
   CalendarDays,
@@ -56,13 +57,7 @@ function formatAppointmentDate(date: string, time: string) {
 
 export default function CustomerDashboardPage() {
   return (
-    <Suspense
-      fallback={
-        <div className="px-6 py-10 text-sm text-[#8e7e86]">
-          Loading your appointments...
-        </div>
-      }
-    >
+    <Suspense fallback={<CustomerOverviewSkeleton />}>
       <CustomerDashboardData />
     </Suspense>
   );

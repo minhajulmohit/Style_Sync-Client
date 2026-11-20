@@ -1,4 +1,5 @@
 import { Suspense } from "react";
+import { AdminOverviewSkeleton } from "@/components/skeletons";
 import {
   ArrowRight,
   CalendarCheck,
@@ -70,13 +71,7 @@ function formatTime(value: string) {
 
 export default function AdminDashboardPage() {
   return (
-    <Suspense
-      fallback={
-        <div className="px-6 py-10 text-sm text-[#8e7e86]">
-          Loading dashboard...
-        </div>
-      }
-    >
+    <Suspense fallback={<AdminOverviewSkeleton />}>
       <AdminDashboardData />
     </Suspense>
   );

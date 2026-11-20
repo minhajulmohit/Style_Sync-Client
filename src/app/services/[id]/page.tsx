@@ -3,6 +3,7 @@ import { headers } from "next/headers"
 import { redirect } from "next/navigation"
 import { auth } from "@/lib/auth"
 import { ServiceDetails } from "@/components/services/service-details"
+import { ServiceDetailsSkeleton } from "@/components/skeletons"
 
 async function ServiceDetailsWithId({
   params,
@@ -25,13 +26,7 @@ export default function ServiceDetailsPage({
   params: Promise<{ id: string }>
 }) {
   return (
-    <Suspense
-      fallback={
-        <div className="flex min-h-64 items-center justify-center bg-[#fffaf8] text-sm text-[#8e7e86]">
-          Loading service details...
-        </div>
-      }
-    >
+    <Suspense fallback={<ServiceDetailsSkeleton />}>
       <ServiceDetailsWithId params={params} />
     </Suspense>
   )

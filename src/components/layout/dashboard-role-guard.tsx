@@ -4,8 +4,14 @@ import { getDashboardRole } from "@/lib/dashboard-role"
 
 function DashboardLoading() {
   return (
-    <div className="px-6 py-10 text-sm text-[#8e7e86]">
-      Checking your account...
+    <div className="min-h-[50vh] p-6 space-y-4">
+      <div className="h-8 w-48 animate-pulse rounded-xl bg-rose-100/70" />
+      <div className="h-4 w-64 animate-pulse rounded bg-rose-100/70" />
+      <div className="grid gap-4 sm:grid-cols-3 pt-4">
+        {Array.from({ length: 3 }).map((_, i) => (
+          <div key={i} className="h-32 animate-pulse rounded-2xl bg-rose-100/70" />
+        ))}
+      </div>
     </div>
   )
 }
