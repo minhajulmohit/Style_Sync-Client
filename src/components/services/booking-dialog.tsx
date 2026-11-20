@@ -48,6 +48,15 @@ function getToday() {
   return `${today.getFullYear()}-${month}-${day}`;
 }
 
+function isPastSlot(date: string, time: string) {
+  const todayStr = getToday();
+  if (date < todayStr) return true;
+  if (date > todayStr) return false;
+  const now = new Date();
+  const currentMinutes = now.getHours() * 60 + now.getMinutes();
+  return timeToMinutes(time) <= currentMinutes;
+}
+
 export function BookingDialog({
   service,
   serviceId,
@@ -119,6 +128,15 @@ export function BookingDialog({
         type: "error",
         title: "Availability not loaded",
         description: "Please try again before sending your booking.",
+      });
+      return;
+    }
+
+    if (isPastSlot(form.date, form.time)) {
+      toast.add({
+        type: "error",
+        title: "Cannot select past time",
+        description: "Please select a future time slot for today.",
       });
       return;
     }
@@ -256,27 +274,32 @@ export function BookingDialog({
                 <option value="">
                   {form.isLoading ? "Loading times..." : "Select a time"}
                 </option>
-                {timeSlots.map((time) => (
-                  <option
-                    key={time}
-                    value={time}
-                    disabled={
-                      form.bookedSlots
-                        ? isTimeUnavailable(
-                            time,
-                            service.duration,
-                            form.bookedSlots,
-                          )
-                        : false
-                    }
-                  >
-                    {time}
-                    {form.bookedSlots &&
-                    isTimeUnavailable(time, service.duration, form.bookedSlots)
-                      ? " — Unavailable"
-                      : ""}
-                  </option>
-                ))}
+                {timeSlots.map((time) => {
+                  const isPast = isPastSlot(form.date, time);
+                  const isBooked = form.bookedSlots
+                    ? isTimeUnavailable(
+                        time,
+                        service.duration,
+                        form.bookedSlots,
+                      )
+                    : false;
+                  const isDisabled = isPast || isBooked;
+
+                  return (
+                    <option
+                      key={time}
+                      value={time}
+                      disabled={isDisabled}
+                    >
+                      {time}
+                      {isPast
+                        ? " — Past time"
+                        : isBooked
+                        ? " — Unavailable"
+                        : ""}
+                    </option>
+                  );
+                })}
               </select>
             </label>
           </div>
