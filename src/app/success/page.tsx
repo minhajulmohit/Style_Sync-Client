@@ -1,6 +1,6 @@
 import { Suspense } from "react";
 import Link from "next/link";
-import { ArrowRight, CheckCircle2, CircleAlert } from "lucide-react";
+import { CheckCircle2, CircleAlert } from "lucide-react";
 import { authenticatedFetch } from "@/lib/actions/authenticated-fetch";
 import { getStripe } from "@/lib/stripe";
 
@@ -73,7 +73,6 @@ function PaymentStatus({
           className="mt-7 inline-flex h-11 items-center justify-center gap-2 rounded-xl bg-[#e45c78] px-5 text-sm font-semibold text-white transition hover:bg-[#d64f70]"
         >
           Back to appointments
-          <ArrowRight aria-hidden="true" size={16} />
         </Link>
       </section>
     </main>

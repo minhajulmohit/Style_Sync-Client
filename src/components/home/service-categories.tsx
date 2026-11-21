@@ -1,6 +1,25 @@
 import Link from "next/link";
-import { ArrowUpRight, Sparkles } from "lucide-react";
-import { SERVICE_CATEGORIES } from "@/types/services";
+import {
+  Brush,
+  Droplets,
+  Flower2,
+  Hand,
+  Palette,
+  ScanFace,
+  Scissors,
+} from "lucide-react";
+import type { LucideIcon } from "lucide-react";
+import { SERVICE_CATEGORIES, type ServiceCategory } from "@/types/services";
+
+const categoryIcons: Record<ServiceCategory, LucideIcon> = {
+  "Haircut & Styling": Scissors,
+  "Hair Coloring": Palette,
+  "Hair Treatment": Droplets,
+  "Facial & Skincare": ScanFace,
+  Makeup: Brush,
+  "Manicure & Pedicure": Hand,
+  "Spa & Massage": Flower2,
+};
 
 export default function ServiceCategories() {
   return (
@@ -25,27 +44,26 @@ export default function ServiceCategories() {
         </div>
 
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-          {SERVICE_CATEGORIES.map((category) => (
-            <Link
-              key={category}
-              href={`/services?category=${encodeURIComponent(category)}`}
-              className="group flex min-h-24 items-center justify-between gap-3 rounded-2xl border border-rose-100 bg-[#fffaf8] p-4 transition hover:-translate-y-0.5 hover:border-rose-200 hover:shadow-md hover:shadow-rose-100/50"
-            >
-              <span className="flex items-center gap-3">
-                <span className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-rose-50 text-[#c65371]">
-                  <Sparkles aria-hidden="true" size={18} />
+          {SERVICE_CATEGORIES.map((category) => {
+            const IconComponent = categoryIcons[category];
+
+            return (
+              <Link
+                key={category}
+                href={`/services?category=${encodeURIComponent(category)}`}
+                className="group flex min-h-24 items-center justify-between gap-3 rounded-2xl border border-rose-100 bg-[#fffaf8] p-4 transition hover:-translate-y-0.5 hover:border-rose-200 hover:shadow-md hover:shadow-rose-100/50"
+              >
+                <span className="flex items-center gap-3">
+                  <span className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-rose-50 text-[#c65371] transition group-hover:bg-rose-100/80">
+                    <IconComponent aria-hidden="true" size={18} />
+                  </span>
+                  <span className="text-sm font-semibold text-[#493943]">
+                    {category}
+                  </span>
                 </span>
-                <span className="text-sm font-semibold text-[#493943]">
-                  {category}
-                </span>
-              </span>
-              <ArrowUpRight
-                aria-hidden="true"
-                size={17}
-                className="shrink-0 text-[#b8aab1] transition group-hover:text-[#c65371]"
-              />
-            </Link>
-          ))}
+              </Link>
+            );
+          })}
         </div>
       </div>
     </section>

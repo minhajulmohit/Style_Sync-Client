@@ -59,7 +59,7 @@ export function ServiceCard({ service }: { service: ServiceRecord }) {
             className={buttonVariants({
               variant: "outline",
               className:
-                "mt-4 h-10 w-full rounded-xl border-rose-100 text-[#e45c78] hover:bg-rose-50 hover:text-[#d34c6b]",
+                "mt-4 flex h-10 w-full items-center justify-center gap-1.5 rounded-xl border-rose-100 text-[#e45c78] hover:bg-rose-50 hover:text-[#d34c6b]",
             })}
           >
             View Details
@@ -68,7 +68,7 @@ export function ServiceCard({ service }: { service: ServiceRecord }) {
           <Button
             disabled
             variant="outline"
-            className="mt-4 h-10 w-full rounded-xl border-rose-100 text-[#e45c78]"
+            className="mt-4 flex h-10 w-full items-center justify-center gap-1.5 rounded-xl border-rose-100 text-[#e45c78]"
           >
             View Details
           </Button>

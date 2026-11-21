@@ -1,8 +1,8 @@
 import { Suspense } from "react";
 import { AdminOverviewSkeleton } from "@/components/skeletons";
 import {
-  ArrowRight,
   CalendarCheck,
+  CalendarDays,
   CircleDollarSign,
   ClipboardList,
   Clock3,
@@ -243,7 +243,7 @@ async function AdminDashboardData() {
                 variant="ghost"
                 className="h-9 rounded-xl px-3 text-xs font-semibold text-[#e45c78] hover:bg-rose-50"
               >
-                View all <ArrowRight />
+                View all <CalendarDays />
               </Button>
             </div>
             <div className="divide-y divide-rose-50">

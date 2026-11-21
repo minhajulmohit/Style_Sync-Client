@@ -4,7 +4,7 @@ import { Field, Input } from "@base-ui/react";
 import { FieldGroup, FieldSet } from "@/components/ui/field";
 import { toast } from "@/components/ui/toast";
 import { authClient } from "@/lib/auth-client";
-import { ArrowRight, Eye, EyeOff, Scissors } from "lucide-react";
+import { Eye, EyeOff, LogIn } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState, type FormEvent } from "react";
@@ -118,7 +118,7 @@ export default function SignInPage() {
       >
         <div className="mb-8 flex flex-col items-center text-center">
           <div className="mb-3 flex size-10 items-center justify-center rounded-xl gradient-surface shadow-sm shadow-rose-200/70">
-            <Scissors aria-hidden="true" size={19} />
+            <LogIn aria-hidden="true" size={19} />
           </div>
           <h1 className="font-heading text-3xl font-semibold tracking-tight text-foreground">
             Welcome back
@@ -190,7 +190,6 @@ export default function SignInPage() {
           className="mt-7 inline-flex h-12 w-full items-center justify-center gap-2 rounded-xl gradient-surface font-medium shadow-md shadow-rose-200/70 transition hover:brightness-105 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-primary disabled:pointer-events-none disabled:opacity-60"
         >
           {isSubmitting ? "Signing in..." : "Sign in"}
-          {!isSubmitting && <ArrowRight aria-hidden="true" size={18} />}
         </button>
 
         <div className="my-6 flex items-center gap-3 text-xs text-muted-foreground">

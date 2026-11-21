@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ArrowLeft, Home, Scissors, Search } from "lucide-react";
+import { ArrowLeft, Compass, Home, Search } from "lucide-react";
 import Navbar from "@/components/navbar/navbar";
 import SiteFooter from "@/components/layout/site-footer";
 import { Button } from "@/components/ui/button";
@@ -12,7 +12,7 @@ export default function NotFound() {
       <main className="flex flex-1 items-center justify-center px-4 py-16 sm:px-6 sm:py-24">
         <div className="mx-auto max-w-lg text-center">
           <div className="relative mx-auto mb-6 flex size-20 items-center justify-center rounded-3xl gradient-surface shadow-xl shadow-rose-200/60">
-            <Scissors aria-hidden="true" size={36} className="text-white" />
+            <Compass aria-hidden="true" size={36} className="text-white" />
             <span className="absolute -bottom-1 -right-1 flex size-7 items-center justify-center rounded-full bg-white text-rose-500 shadow-md">
               <Search size={14} strokeWidth={2.5} />
             </span>

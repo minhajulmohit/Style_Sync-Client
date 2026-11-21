@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
-import { Search, Scissors, Sparkles } from "lucide-react";
+import { BookOpen, ListChecks, Search } from "lucide-react";
 import { ServiceCard } from "@/components/services/service-card";
 import { Input } from "@/components/ui/input";
 import { getServices } from "@/lib/api/services";
@@ -100,7 +100,7 @@ export default function BrowseServices() {
         <div className="mx-auto max-w-7xl">
           <div className="mx-auto max-w-3xl text-center">
             <p className="mb-4 inline-flex items-center gap-2 rounded-full border border-rose-100 bg-white/80 px-4 py-2 text-xs font-semibold uppercase tracking-[0.16em] text-[#c65371] shadow-sm shadow-rose-100/60">
-              <Sparkles aria-hidden="true" size={14} />
+              <BookOpen aria-hidden="true" size={14} />
               The StyleSync service menu
             </p>
             <h1 className="font-heading text-4xl font-semibold tracking-tight text-[#352a31] sm:text-5xl">
@@ -114,7 +114,7 @@ export default function BrowseServices() {
 
             {!isLoading && !errorMessage && (
               <div className="mt-6 inline-flex items-center gap-2 rounded-full bg-white/75 px-4 py-2 text-sm text-[#756a72] shadow-sm shadow-rose-100/50">
-                <Scissors
+                <ListChecks
                   aria-hidden="true"
                   size={16}
                   className="text-[#c65371]"

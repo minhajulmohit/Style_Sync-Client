@@ -1,11 +1,14 @@
 import { Suspense } from "react";
 import { CustomerOverviewSkeleton } from "@/components/skeletons";
 import {
-  ArrowRight,
+  CalendarCheck,
+  CalendarClock,
   CalendarDays,
   Check,
   Clock3,
-  Scissors,
+  Compass,
+  Heart,
+  Search,
   Sparkles,
 } from "lucide-react";
 import Link from "next/link";
@@ -111,7 +114,7 @@ async function CustomerDashboardData() {
           <div className="relative grid gap-8 md:grid-cols-[1fr_auto] md:items-center">
             <div>
               <span className="inline-flex items-center gap-2 rounded-full bg-white/15 px-3 py-1.5 text-xs font-medium text-white/90 backdrop-blur">
-                <Sparkles aria-hidden="true" size={14} />
+                <CalendarClock aria-hidden="true" size={14} />
                 Your next appointment
               </span>
               <h2 className="mt-5 max-w-lg font-heading text-2xl font-semibold tracking-tight sm:text-3xl">
@@ -133,7 +136,7 @@ async function CustomerDashboardData() {
                 }
                 className="mt-6 h-10 rounded-xl bg-white px-4 font-semibold text-[#d64f70] shadow-sm hover:bg-white/90"
               >
-                View appointments <ArrowRight />
+                View appointments <CalendarCheck />
               </Button>
             </div>
             {nextAppointment && (
@@ -231,7 +234,7 @@ async function CustomerDashboardData() {
                     variant="ghost"
                     className="mt-2 text-[#df5574]"
                   >
-                    Browse services <ArrowRight />
+                    Browse services <Search />
                   </Button>
                 </div>
               )}
@@ -240,8 +243,8 @@ async function CustomerDashboardData() {
 
           <aside className="flex flex-col gap-5">
             <section className="rounded-2xl border border-rose-100/70 bg-white p-5 shadow-sm shadow-rose-100/40 sm:p-6">
-              <div className="flex size-11 items-center justify-center rounded-2xl bg-violet-50 text-violet-500">
-                <Scissors aria-hidden="true" size={20} />
+              <div className="flex size-11 items-center justify-center rounded-2xl bg-rose-50 text-[#e45c78]">
+                <Heart aria-hidden="true" size={20} />
               </div>
               <h2 className="mt-4 font-heading text-lg font-semibold text-[#352a31]">
                 Your beauty routine
@@ -272,7 +275,7 @@ async function CustomerDashboardData() {
                 variant="ghost"
                 className="mt-3 h-9 rounded-xl px-0 text-sm font-semibold text-[#df5574] hover:bg-transparent hover:text-[#c94162]"
               >
-                Explore services <ArrowRight />
+                Explore services <Compass />
               </Button>
             </section>
           </aside>

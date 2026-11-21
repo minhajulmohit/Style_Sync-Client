@@ -1,6 +1,6 @@
 import { Suspense } from "react";
 import { TablePageSkeleton } from "@/components/skeletons";
-import { CalendarDays } from "lucide-react";
+import { CalendarDays, Check, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { updateAppointmentStatus } from "@/lib/actions/admin-appointments";
 import { authenticatedFetch } from "@/lib/actions/authenticated-fetch";
@@ -242,8 +242,9 @@ async function AppointmentsTable() {
                             <Button
                               type="submit"
                               size="sm"
-                              className="rounded-lg bg-emerald-600 text-white hover:bg-emerald-700"
+                              className="inline-flex items-center gap-1 rounded-lg bg-emerald-600 text-white hover:bg-emerald-700"
                             >
+                              <Check size={14} />
                               Confirm
                             </Button>
                           </form>
@@ -263,8 +264,9 @@ async function AppointmentsTable() {
                             type="submit"
                             size="sm"
                             variant="outline"
-                            className="rounded-lg border-rose-200 text-rose-700 hover:bg-rose-50"
+                            className="inline-flex items-center gap-1 rounded-lg border-rose-200 text-rose-700 hover:bg-rose-50"
                           >
+                            <X size={14} />
                             Cancel
                           </Button>
                         </form>

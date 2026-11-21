@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, type ChangeEvent, type FormEvent } from "react";
-import { ArrowLeft, ImagePlus, LoaderCircle, Scissors } from "lucide-react";
+import { ArrowLeft, ImagePlus, LoaderCircle, PlusCircle } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
@@ -142,7 +142,7 @@ export default function AddServicePage() {
 
         <div className="mb-6 flex items-center gap-3">
           <span className="gradient-surface flex size-11 items-center justify-center rounded-2xl shadow-md shadow-rose-200/50">
-            <Scissors aria-hidden="true" size={20} />
+            <PlusCircle aria-hidden="true" size={20} />
           </span>
           <div>
             <h1 className="font-heading text-2xl font-semibold tracking-tight text-[#352a31]">

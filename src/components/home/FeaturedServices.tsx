@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { ChevronDown, Sparkles } from "lucide-react";
+import { Star } from "lucide-react";
 import { ServiceCard } from "@/components/services/service-card";
 import {
   Carousel,
@@ -166,7 +166,7 @@ export default function FeaturedServices() {
         <div className="mb-9 flex flex-col gap-5 sm:mb-11 sm:flex-row sm:items-end sm:justify-between">
           <div className="max-w-2xl">
             <p className="mb-3 inline-flex items-center gap-2 rounded-full border border-rose-100 bg-white/80 px-3.5 py-1.5 text-xs font-semibold uppercase tracking-[0.16em] text-[#c65371] shadow-sm shadow-rose-100/50">
-              <Sparkles aria-hidden="true" size={14} />
+              <Star aria-hidden="true" size={14} />
               Made for your moment
             </p>
             <h2
@@ -183,11 +183,6 @@ export default function FeaturedServices() {
           </div>
 
           <div className="flex w-fit items-center gap-2 rounded-2xl border border-white/80 bg-white/75 px-4 py-3 text-sm text-[#756a72] shadow-sm shadow-rose-100/50 backdrop-blur">
-            <ChevronDown
-              aria-hidden="true"
-              size={17}
-              className="animate-bounce text-[#c65371]"
-            />
             Featured
           </div>
         </div>

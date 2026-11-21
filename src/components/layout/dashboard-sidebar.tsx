@@ -6,8 +6,8 @@ import {
   ChartNoAxesCombined,
   CircleUserRound,
   LayoutDashboard,
+  PlusCircle,
   Scissors,
-  Settings2,
   UserRound,
   UsersRound,
 } from "lucide-react";
@@ -36,7 +36,7 @@ const adminLinks = [
   },
   {
     label: "Add Service",
-    icon: Settings2,
+    icon: PlusCircle,
     path: "/dashboard/admin/add-service",
   },
   {

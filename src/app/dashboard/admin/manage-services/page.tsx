@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { Clock3, Eye, ImageIcon, LoaderCircle, Plus, Scissors } from "lucide-react";
+import { Clock3, Eye, ImageIcon, LoaderCircle, PackageOpen, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { DeleteServiceButton } from "@/components/services/delete-service-button";
 import { ServiceStatusToggle } from "@/components/services/service-status-toggle";
@@ -156,7 +156,7 @@ export default function ManageServicesPage() {
         ) : services.length === 0 ? (
           <div className="flex min-h-56 flex-col items-center justify-center rounded-2xl border border-dashed border-rose-200 bg-white px-5 text-center">
             <span className="flex size-12 items-center justify-center rounded-2xl bg-rose-50 text-[#e45c78]">
-              <Scissors aria-hidden="true" size={22} />
+              <PackageOpen aria-hidden="true" size={22} />
             </span>
             <h2 className="mt-4 font-heading text-lg font-semibold text-[#493943]">
               No services yet

@@ -8,7 +8,7 @@ import {
   Clock3,
   Eye,
   ImageIcon,
-  Scissors,
+  Tag,
   X,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
@@ -314,7 +314,7 @@ function AppointmentDetails({
           <div className="rounded-xl bg-[#fff7f4] p-4">
             <p className="text-xs text-[#9a8d95]">Category</p>
             <p className="mt-1 flex items-center gap-2 text-sm font-medium text-[#493943]">
-              <Scissors aria-hidden="true" size={15} className="text-[#e77a8e]" />
+              <Tag aria-hidden="true" size={15} className="text-[#e77a8e]" />
               {appointment.category ?? "Not available"}
             </p>
           </div>

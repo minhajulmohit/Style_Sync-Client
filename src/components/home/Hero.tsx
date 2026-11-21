@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ArrowRight, Sparkles } from "lucide-react";
+import { Search, WandSparkles } from "lucide-react";
 import HeroBanner from "./HeroBanner";
 
 export default function Hero() {
@@ -7,7 +7,7 @@ export default function Hero() {
     <section className="mx-auto grid w-full max-w-7xl grid-cols-1 items-center gap-12 px-6 py-14 sm:px-8 lg:grid-cols-2 lg:gap-16 lg:py-20">
       <div className="flex flex-col items-start">
         <div className="mb-6 inline-flex items-center gap-2 rounded-full bg-primary/10 px-4 py-2 text-sm font-medium text-primary">
-          <Sparkles aria-hidden="true" size={16} />
+          <WandSparkles aria-hidden="true" size={16} />
           <span>Your style, your way</span>
         </div>
 
@@ -26,7 +26,7 @@ export default function Hero() {
           className="mt-8 inline-flex min-h-12 items-center justify-center gap-2 rounded-full bg-primary px-6 py-3 font-medium text-primary-foreground hover:bg-primary/90 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-primary"
         >
           Explore Salon Services
-          <ArrowRight aria-hidden="true" size={18} />
+          <Search aria-hidden="true" size={18} />
         </Link>
 
         <div className="mt-10 flex flex-wrap items-center gap-x-10 gap-y-5">

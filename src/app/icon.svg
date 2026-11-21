@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <defs>
+    <linearGradient id="scissors" x1="12" y1="12" x2="52" y2="52" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#e45c78" />
+      <stop offset="1" stop-color="#a36be3" />
+    </linearGradient>
+  </defs>
+  <rect x="2" y="2" width="60" height="60" rx="18" fill="#fff4f5" />
+  <g
+    fill="none"
+    stroke="url(#scissors)"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+    stroke-width="4"
+  >
+    <circle cx="17" cy="18" r="8" />
+    <circle cx="17" cy="46" r="8" />
+    <path d="m23 24 27 27M23 40l27-27M28 32h2" />
+  </g>
+</svg>
