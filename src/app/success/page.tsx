@@ -16,6 +16,7 @@ type PaymentPageProps = {
 type VerificationResult = {
   success?: boolean;
   message?: string;
+  paid?: boolean;
 };
 
 function PaymentStatus({
@@ -54,9 +55,7 @@ function PaymentStatus({
         </h1>
         <p className="mt-2 text-sm leading-6 text-[#8e7e86]">{message}</p>
         {amount && (
-          <p className="mt-5 text-2xl font-semibold text-[#e45c78]">
-            {amount}
-          </p>
+          <p className="mt-5 text-2xl font-semibold text-[#e45c78]">{amount}</p>
         )}
         {bookingId && (
           <p className="mt-4 text-xs text-[#9a8d95]">
@@ -117,7 +116,10 @@ async function PaymentResult({ searchParams }: PaymentPageProps) {
   }
 
   const stripeSession = await getStripe().checkout.sessions.retrieve(sessionId);
-  if (stripeSession.status !== "complete" || stripeSession.payment_status !== "paid") {
+  if (
+    stripeSession.status !== "complete" ||
+    stripeSession.payment_status !== "paid"
+  ) {
     return (
       <PaymentStatus
         isSuccess={false}
@@ -164,7 +166,11 @@ async function PaymentResult({ searchParams }: PaymentPageProps) {
     <PaymentStatus
       isSuccess
       title="Payment successful"
-      message="Your payment is verified and your appointment is marked as paid."
+      message={
+        result.paid
+          ? "Your payment is verified and your appointment is marked as paid."
+          : "Payment received! Your appointment will show Paid in a few seconds."
+      }
       bookingId={stripeSession.metadata?.bookingId}
       sessionId={sessionId}
       amount={amount}
