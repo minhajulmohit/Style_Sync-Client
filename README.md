@@ -1,10 +1,38 @@
 # StyleSync - Salon Service Booking Platform
 
-\*\*StyleSync\*\* is a full-stack, fully responsive web application designed to streamline appointment scheduling for salons and beauty parlors. Built using \*\*Next.js (App Router)\*\*, \*\*Express.js\*\*, \*\*MongoDB\*\*, \*\*Better Auth\*\*, and \*\*Stripe\*\*, the platform connects customers with professional salon services seamlessly while providing administrators with a powerful dashboard to manage services, bookings, users, and financial transactions in real time.
+**StyleSync** is a full-stack, fully responsive web application designed to
+streamline appointment scheduling for salons and beauty parlors. Built using
+**Next.js (App Router)**, **Express.js**, **MongoDB**, **Better Auth**, and
+**Stripe**, the platform connects customers with professional salon services
+while giving administrators tools to manage services, bookings, users, and
+transactions.
 
 ## Important Features
 
-\### 👤 Customer Features \* \*\*Service Discovery:\*\* Explore salon services categorized by styling, skincare, coloring, and treatment, with live search, category filtering, and price sorting. \* \*\*Hassle-Free Booking:\*\* Interactive appointment request system allowing users to select dates, predefined time slots, and add custom notes. \* \*\*Appointment Tracking:\*\* Real-time dashboard to monitor booking status (\`Pending\`, \`Confirmed\`, \`Cancelled\`) and cancel pending requests. \* \*\*Secure Online Payments:\*\* Seamless integration with \*\*Stripe Checkout\*\* for fast and secure payments once appointments are confirmed. \* \*\*Personal Profile:\*\* Easily manage user details and update profile pictures via \*\*ImgBB API\*\*. ### 🛠️ Admin Control &amp; Dashboard \* \*\*Analytics Overview:\*\* High-level overview displaying total customers, active services, appointment metrics, and overall revenue. \* \*\*Service Management (CRUD):\*\* Add, update, delete, and toggle status (\`Active\`/\`Inactive\`) of salon services with strict payload validation. \* \*\*Appointment Workflow:\*\* Review incoming appointment requests and approve (\`Confirmed\`) or decline (\`Cancelled\`) bookings. \* \*\*User Oversight &amp; Security:\*\* View all registered customers with server-enforced \*\*Block/Unblock\*\* security controls. \* \*\*Financial Ledger:\*\* Immutable transaction tracking synced automatically via verified \*\*Stripe Webhooks\*\*.
+### Customer Features
+
+- **Service discovery:** Browse services with live search, category filters,
+  and price sorting.
+- **Hassle-free booking:** Select appointment dates and available time slots,
+  then add booking notes.
+- **Appointment tracking:** View `Pending`, `Confirmed`, and `Cancelled`
+  bookings; customers can cancel pending appointments.
+- **Secure online payments:** Pay for confirmed appointments through Stripe
+  Checkout.
+- **Personal profile:** Manage account details and upload profile pictures
+  through ImgBB.
+
+### Admin Control & Dashboard
+
+- **Analytics overview:** Review customer, service, appointment, and revenue
+  metrics.
+- **Service management:** Create, update, delete, and change service status.
+- **Appointment workflow:** Confirm pending bookings or cancel eligible
+  appointments.
+- **User oversight and security:** Manage customers and block or unblock
+  accounts.
+- **Financial ledger:** Review transactions recorded from verified Stripe
+  webhooks.
 
 ## Technology Stack
 
