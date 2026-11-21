@@ -2,6 +2,7 @@ import { Suspense } from "react";
 import { CheckCircle2, CircleAlert } from "lucide-react";
 import { authenticatedFetch } from "@/lib/actions/authenticated-fetch";
 import { getStripe } from "@/lib/stripe";
+import { PaymentStatusRefresh } from "@/components/payment/payment-status-refresh";
 
 const baseUrl =
   process.env.NEXT_PUBLIC_API_BASE_URL ||
@@ -28,6 +29,7 @@ function PaymentStatus({
   bookingId,
   sessionId,
   amount,
+  refreshPending = false,
 }: {
   isSuccess: boolean;
   title: string;
@@ -35,6 +37,7 @@ function PaymentStatus({
   bookingId?: string;
   sessionId?: string;
   amount?: string;
+  refreshPending?: boolean;
 }) {
   return (
     <main className="flex min-h-[calc(100svh-5rem)] items-center justify-center bg-[#fffaf8] px-4 py-10">
@@ -56,6 +59,7 @@ function PaymentStatus({
           {title}
         </h1>
         <p className="mt-2 text-sm leading-6 text-[#8e7e86]">{message}</p>
+        {refreshPending && <PaymentStatusRefresh />}
         {amount && (
           <p className="mt-5 text-2xl font-semibold text-[#e45c78]">{amount}</p>
         )}
@@ -183,13 +187,18 @@ async function PaymentResult({ searchParams }: PaymentPageProps) {
 
   return (
     <PaymentStatus
-      isSuccess
-      title="Payment successful"
+      isSuccess={result.paid === true}
+      title={
+        result.paid
+          ? "Payment successful"
+          : "Payment confirmation pending"
+      }
       message={
         result.paid
           ? "Your payment is verified and your appointment is marked as paid."
-          : "Payment received! Your appointment will show Paid in a few seconds."
+          : "Stripe confirmed your payment. Your appointment will show Paid once the payment webhook updates it. Please check your appointments again shortly."
       }
+      refreshPending={result.paid !== true}
       bookingId={stripeSession.metadata?.bookingId}
       sessionId={sessionId}
       amount={amount}
