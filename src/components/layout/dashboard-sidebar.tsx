@@ -78,9 +78,10 @@ const customerLinks = [
 export function DashboardSidebar() {
   const pathname = usePathname();
   const { data: session } = authClient.useSession();
-  const isAdmin = (session?.user?.role ?? "")
+  const roleIsAdmin = (session?.user?.role ?? "")
     .split(",")
     .some((role) => role.trim().toLowerCase() === "admin");
+  const isAdmin = roleIsAdmin || pathname.startsWith("/dashboard/admin");
   const links = isAdmin ? adminLinks : customerLinks;
   const name =
     session?.user?.name || (isAdmin ? "Admin account" : "Customer account");
