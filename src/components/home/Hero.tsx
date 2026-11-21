@@ -1,8 +1,96 @@
+"use client";
+
 import Link from "next/link";
 import { Search, WandSparkles } from "lucide-react";
+import { useEffect, useState } from "react";
+import { getServices } from "@/lib/api/services";
 import HeroBanner from "./HeroBanner";
 
 export default function Hero() {
+  const [activeServiceCount, setActiveServiceCount] = useState<number | null>(
+    null,
+  );
+  const [averageRating, setAverageRating] = useState<number | null>(null);
+  const [isLoadingStats, setIsLoadingStats] = useState(true);
+  const [hasStatsError, setHasStatsError] = useState(false);
+
+  useEffect(() => {
+    let isMounted = true;
+    const baseUrl =
+      process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8000";
+
+    async function loadStats() {
+      const [servicesResult, reviewsResult] = await Promise.allSettled([
+        getServices(),
+        fetch(`${baseUrl}/reviews`, { cache: "no-store" }).then(
+          async (response) => {
+            if (!response.ok) {
+              throw new Error(`Could not load reviews (HTTP ${response.status}).`);
+            }
+
+            const reviews: unknown = await response.json();
+            if (!Array.isArray(reviews)) {
+              throw new Error("The reviews response is invalid.");
+            }
+
+            return reviews;
+          },
+        ),
+      ]);
+
+      if (!isMounted) return;
+
+      if (servicesResult.status === "fulfilled") {
+        setActiveServiceCount(servicesResult.value.length);
+      } else {
+        console.error(
+          "Could not load active service count:",
+          servicesResult.reason,
+        );
+        setHasStatsError(true);
+      }
+
+      if (reviewsResult.status === "fulfilled") {
+        const ratings: number[] = reviewsResult.value.flatMap(
+          (review: unknown) => {
+            if (
+              typeof review !== "object" ||
+              review === null ||
+              !("rating" in review)
+            ) {
+              return [];
+            }
+
+            const rating = review.rating;
+            return typeof rating === "number" &&
+              Number.isFinite(rating) &&
+              rating >= 1 &&
+              rating <= 5
+              ? [rating]
+              : [];
+          },
+        );
+
+        setAverageRating(
+          ratings.length
+            ? ratings.reduce((total, rating) => total + rating, 0) /
+                ratings.length
+            : null,
+        );
+      } else {
+        console.error("Could not load review ratings:", reviewsResult.reason);
+        setHasStatsError(true);
+      }
+
+      setIsLoadingStats(false);
+    }
+
+    void loadStats();
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
   return (
     <section className="mx-auto grid w-full max-w-7xl grid-cols-1 items-center gap-12 px-6 py-14 sm:px-8 lg:grid-cols-2 lg:gap-16 lg:py-20">
       <div className="flex flex-col items-start">
@@ -29,15 +117,32 @@ export default function Hero() {
           <Search aria-hidden="true" size={18} />
         </Link>
 
-        <div className="mt-10 flex flex-wrap items-center gap-x-10 gap-y-5">
+        <div
+          className="mt-10 flex flex-wrap items-center gap-x-10 gap-y-5"
+          aria-busy={isLoadingStats}
+        >
           <div>
-            <p className="text-2xl font-semibold text-foreground">50+</p>
-            <p className="mt-1 text-sm text-muted-foreground">Local stylists</p>
+            <p className="text-2xl font-semibold text-foreground" aria-live="polite">
+              {activeServiceCount ??
+                (isLoadingStats ? "..." : "N/A")}
+            </p>
+            <p className="mt-1 text-sm text-muted-foreground">Active services</p>
           </div>
           <div>
-            <p className="text-2xl font-semibold text-foreground">4.9/5</p>
+            <p className="text-2xl font-semibold text-foreground" aria-live="polite">
+              {averageRating === null
+                ? isLoadingStats
+                  ? ".../5"
+                  : "N/A/5"
+                : `${averageRating.toFixed(1)}/5`}
+            </p>
             <p className="mt-1 text-sm text-muted-foreground">Average rating</p>
           </div>
+          {hasStatsError && (
+            <p className="w-full text-sm text-muted-foreground" role="status">
+              Some salon statistics could not be loaded.
+            </p>
+          )}
         </div>
       </div>
 
