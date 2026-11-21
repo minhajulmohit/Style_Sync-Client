@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import { AuthPageGuard } from "@/lib/auth-page-guard";
+import { AuthPageGuard } from "@/components/auth/auth-page-guard";
 
 export default function SignInLayout({
   children,
