@@ -6,14 +6,41 @@ import { useRouter } from "next/navigation";
 import { ChevronDown, LayoutDashboard, LogOut } from "lucide-react";
 import { authClient } from "@/lib/auth-client";
 import { toast } from "@/components/ui/toast";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { usePathname } from "next/navigation";
 
 const NavButtons = () => {
   const router = useRouter();
+  const pathname = usePathname();
   const { data: session, isPending } = authClient.useSession();
   const [isLoggingOut, setIsLoggingOut] = useState(false);
+  const accountMenuRef = useRef<HTMLDetailsElement>(null);
   const user = session?.user;
   const firstLetter = user?.name.trim().charAt(0).toUpperCase() || "U";
+
+  useEffect(() => {
+    if (accountMenuRef.current) {
+      accountMenuRef.current.open = false;
+    }
+  }, [pathname]);
+
+  useEffect(() => {
+    function handlePointerDown(event: PointerEvent) {
+      const menu = accountMenuRef.current;
+      if (
+        menu?.open &&
+        event.target instanceof Node &&
+        !menu.contains(event.target)
+      ) {
+        menu.open = false;
+      }
+    }
+
+    document.addEventListener("pointerdown", handlePointerDown);
+    return () => {
+      document.removeEventListener("pointerdown", handlePointerDown);
+    };
+  }, []);
 
   const handleLogout = async () => {
     setIsLoggingOut(true);
@@ -62,7 +89,17 @@ const NavButtons = () => {
         </>
       )}
       {!isPending && user && (
-        <details className="relative">
+        <details
+          className="relative"
+          ref={accountMenuRef}
+          onClickCapture={(event) => {
+            if (event.target instanceof Element && event.target.closest("a")) {
+              if (accountMenuRef.current) {
+                accountMenuRef.current.open = false;
+              }
+            }
+          }}
+        >
           <summary
             aria-label={`Account menu for ${user.name}`}
             className="flex cursor-pointer list-none items-center gap-1.5 rounded-full p-1 transition hover:bg-rose-50 focus-visible:outline-2 focus-visible:outline-primary [&::-webkit-details-marker]:hidden"
