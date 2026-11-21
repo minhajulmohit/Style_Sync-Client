@@ -16,12 +16,23 @@ export default function BrowseServices() {
   const [isLoading, setIsLoading] = useState(true);
   const [errorMessage, setErrorMessage] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
-  const [selectedCategory, setSelectedCategory] = useState(() =>
+  const urlSelectedCategory =
     SERVICE_CATEGORIES.find(
       (category) => formatServiceCategory(category) === categoryFromUrl,
-    ) ?? "All",
-  );
+    ) ?? "All";
+  const [categorySelection, setCategorySelection] = useState(() => ({
+    urlCategory: categoryFromUrl,
+    category: urlSelectedCategory,
+  }));
+  const selectedCategory =
+    categorySelection.urlCategory === categoryFromUrl
+      ? categorySelection.category
+      : urlSelectedCategory;
   const [sortOrder, setSortOrder] = useState("default");
+
+  const selectCategory = (category: string) => {
+    setCategorySelection({ urlCategory: categoryFromUrl, category });
+  };
 
   useEffect(() => {
     let isCurrent = true;
@@ -81,7 +92,7 @@ export default function BrowseServices() {
 
   const clearFilters = () => {
     setSearchQuery("");
-    setSelectedCategory("All");
+    selectCategory("All");
     setSortOrder("default");
   };
 
@@ -179,7 +190,7 @@ export default function BrowseServices() {
                 <button
                   type="button"
                   aria-pressed={selectedCategory === "All"}
-                  onClick={() => setSelectedCategory("All")}
+                  onClick={() => selectCategory("All")}
                   className={`rounded-full border px-4 py-2 text-sm font-medium transition ${
                     selectedCategory === "All"
                       ? "gradient-surface border-transparent shadow-sm shadow-rose-200/50"
@@ -193,7 +204,7 @@ export default function BrowseServices() {
                     key={category}
                     type="button"
                     aria-pressed={selectedCategory === category}
-                    onClick={() => setSelectedCategory(category)}
+                    onClick={() => selectCategory(category)}
                     className={`rounded-full border px-4 py-2 text-sm font-medium transition ${
                       selectedCategory === category
                         ? "gradient-surface border-transparent shadow-sm shadow-rose-200/50"
