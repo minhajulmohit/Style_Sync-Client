@@ -1,11 +1,10 @@
 import type { ReactNode } from "react";
-import { redirectIfAuthenticated } from "@/lib/auth-page-guard";
+import { AuthPageGuard } from "@/lib/auth-page-guard";
 
-export default async function SignInLayout({
+export default function SignInLayout({
   children,
 }: {
   children: ReactNode;
 }) {
-  await redirectIfAuthenticated();
-  return children;
+  return <AuthPageGuard>{children}</AuthPageGuard>;
 }
