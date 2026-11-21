@@ -31,6 +31,9 @@ export const auth = betterAuth({
     enabled: true,
     minPasswordLength: 6,
   },
+  session: {
+    expiresIn: 7 * 24 * 60 * 60,
+  },
   databaseHooks: {
     session: {
       create: {
