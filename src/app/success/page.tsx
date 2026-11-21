@@ -4,7 +4,11 @@ import { CheckCircle2, CircleAlert } from "lucide-react";
 import { authenticatedFetch } from "@/lib/actions/authenticated-fetch";
 import { getStripe } from "@/lib/stripe";
 
-const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8000";
+const baseUrl =
+  process.env.NEXT_PUBLIC_API_BASE_URL ||
+  (process.env.NODE_ENV === "production"
+    ? "https://style-sync-server.vercel.app"
+    : "http://localhost:8000");
 
 type PaymentPageProps = {
   searchParams: Promise<{

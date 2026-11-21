@@ -3,7 +3,11 @@ import { headers } from "next/headers";
 import { auth } from "@/lib/auth";
 import { getStripe } from "@/lib/stripe";
 
-const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8000";
+const baseUrl =
+  process.env.NEXT_PUBLIC_API_BASE_URL ||
+  (process.env.NODE_ENV === "production"
+    ? "https://style-sync-server.vercel.app"
+    : "http://localhost:8000");
 
 type CheckoutBooking = {
   _id: string;
