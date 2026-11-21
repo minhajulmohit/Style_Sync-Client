@@ -7,6 +7,8 @@ const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8000";
 type Transaction = {
   _id?: string;
   sessionId?: string;
+  stripeSessionId?: string;
+  status?: string;
   customer_email?: string;
   userId?: string;
   payment_intent?: string;
@@ -90,6 +92,27 @@ function formatDate(value?: string | Date) {
   });
 }
 
+// লম্বা Stripe session id ছোট করে দেখাই: cs_test_a1b2...x9y8
+function shortSessionId(sessionId?: string) {
+  if (!sessionId) return "—";
+  if (sessionId.length <= 20) return sessionId;
+  return `${sessionId.slice(0, 14)}...${sessionId.slice(-6)}`;
+}
+
+// Stripe "paid" / "complete" দুটোকেই "Paid" দেখাই
+function getPaymentStatusLabel(transaction: Transaction) {
+  const status = (
+    transaction.payment_status ||
+    transaction.status ||
+    ""
+  ).toLowerCase();
+
+  if (status === "paid" || status === "complete") return "Paid";
+  if (status === "unpaid") return "Unpaid";
+  if (!status) return "Unknown";
+  return status.charAt(0).toUpperCase() + status.slice(1);
+}
+
 function formatAmount(amount?: number | null, currency?: string | null) {
   if (amount === null || amount === undefined) return "—";
 
@@ -159,16 +182,17 @@ async function TransactionsTable() {
         </span>
       </div>
       <div className="overflow-x-auto">
-        <table className="w-full min-w-[1080px] text-left text-sm">
+        <table className="w-full min-w-[1100px] text-left text-sm">
           <thead>
             <tr className="border-b border-rose-100/70 bg-rose-50/50 text-xs text-[#8e7e86]">
               <th className="px-4 py-3 font-medium">Customer</th>
               <th className="px-4 py-3 font-medium">Related Service</th>
               <th className="px-4 py-3 font-medium">Appointment Date</th>
               <th className="px-4 py-3 font-medium">Amount</th>
-              <th className="px-4 py-3 font-medium">Payment intent</th>
-              <th className="px-4 py-3 font-medium">Payment status</th>
-              <th className="px-4 py-3 font-medium">Payment Date</th>
+              <th className="px-4 py-3 font-medium">Currency</th>
+              <th className="px-4 py-3 font-medium">Stripe Session ID</th>
+              <th className="px-4 py-3 font-medium">Payment Status</th>
+              <th className="px-4 py-3 font-medium">Transaction Date</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-rose-50">
@@ -177,6 +201,8 @@ async function TransactionsTable() {
               const booking = transaction.bookingId ? bookingsMap.get(transaction.bookingId) : undefined;
               const relatedService = transaction.serviceName || booking?.serviceName || (transaction.bookingId ? "Salon Service" : "—");
               const appointmentDate = transaction.appointmentDate || (booking?.date ? `${booking.date} · ${booking.time}` : "—");
+              const sessionId = transaction.sessionId || transaction.stripeSessionId;
+              const statusLabel = getPaymentStatusLabel(transaction);
 
               return (
                 <tr
@@ -205,18 +231,21 @@ async function TransactionsTable() {
                   <td className="px-4 py-4 whitespace-nowrap font-medium text-[#e45c78]">
                     {formatAmount(transaction.amount_total, transaction.currency)}
                   </td>
-                  <td className="max-w-44 break-all px-4 py-4 text-xs text-[#756a72]">
-                    {transaction.payment_intent || "—"}
+                  <td className="px-4 py-4 text-xs font-medium uppercase text-[#756a72]">
+                    {transaction.currency || "usd"}
+                  </td>
+                  <td className="px-4 py-4 font-mono text-xs text-[#756a72]">
+                    <span title={sessionId}>{shortSessionId(sessionId)}</span>
                   </td>
                   <td className="px-4 py-4">
                     <span
                       className={`rounded-full px-2.5 py-1 text-xs font-medium ${
-                        transaction.payment_status?.toLowerCase() === "paid"
+                        statusLabel === "Paid"
                           ? "bg-emerald-50 text-emerald-700"
                           : "bg-amber-50 text-amber-700"
                       }`}
                     >
-                      {transaction.payment_status || "Unknown"}
+                      {statusLabel}
                     </span>
                   </td>
                   <td className="px-4 py-4 whitespace-nowrap text-xs text-[#756a72]">
@@ -227,7 +256,7 @@ async function TransactionsTable() {
             })}
             {transactions.length === 0 && (
               <tr>
-                <td colSpan={7} className="px-4 py-14 text-center">
+                <td colSpan={8} className="px-4 py-14 text-center">
                   <BadgeDollarSign
                     aria-hidden="true"
                     className="mx-auto mb-3 text-[#d3b8c0]"

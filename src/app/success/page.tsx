@@ -12,7 +12,6 @@ const baseUrl =
 type PaymentPageProps = {
   searchParams: Promise<{
     session_id?: string;
-    cancelled?: string;
   }>;
 };
 
@@ -96,17 +95,7 @@ export default function PaymentSuccessPage({ searchParams }: PaymentPageProps) {
 }
 
 async function PaymentResult({ searchParams }: PaymentPageProps) {
-  const { session_id: sessionId, cancelled } = await searchParams;
-
-  if (cancelled === "1") {
-    return (
-      <PaymentStatus
-        isSuccess={false}
-        title="Payment cancelled"
-        message="Your appointment is still unpaid. You can try the payment again from My Appointments."
-      />
-    );
-  }
+  const { session_id: sessionId } = await searchParams;
 
   if (!sessionId) {
     return (

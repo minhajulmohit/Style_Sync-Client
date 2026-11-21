@@ -12,7 +12,15 @@ async function getAdminUsers(): Promise<AdminUser[]> {
   }
 
   const users: AdminUser[] = await response.json();
-  return users;
+
+  // শুধু customer দেখাবো, admin account list এ থাকবে না
+  const customers = users.filter((user) => {
+    const roles = (user.role ?? "")
+      .split(",")
+      .map((role) => role.trim().toLowerCase());
+    return !roles.includes("admin");
+  });
+  return customers;
 }
 
 export default function ManageUsersPage() {
@@ -27,7 +35,7 @@ export default function ManageUsersPage() {
             Manage Users
           </h1>
           <p className="mt-2 text-sm text-[#8e7e86]">
-            View registered customers and account status.
+            View registered customers, their details and account status.
           </p>
         </header>
         <Suspense

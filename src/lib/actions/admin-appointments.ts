@@ -5,34 +5,64 @@ import { authenticatedFetch } from "@/lib/actions/authenticated-fetch";
 
 const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8000";
 
-export async function updateAppointmentStatus(formData: FormData) {
-  const bookingId = formData.get("bookingId");
-  const status = formData.get("status");
+export type AppointmentStatusUpdate = "Confirmed" | "Cancelled";
 
-  if (
-    typeof bookingId !== "string" ||
-    !bookingId ||
-    typeof status !== "string" ||
-    !["Confirmed", "Cancelled"].includes(status)
-  ) {
-    throw new Error("Invalid appointment update.");
+export type AppointmentActionResult = {
+  ok: boolean;
+  message: string;
+};
+
+// Admin Confirm / Cancel. Error throw না করে result return করি,
+// যাতে client component toast দেখাতে পারে।
+export async function updateAppointmentStatus(
+  bookingId: string,
+  status: AppointmentStatusUpdate,
+): Promise<AppointmentActionResult> {
+  if (!bookingId || (status !== "Confirmed" && status !== "Cancelled")) {
+    return { ok: false, message: "Invalid appointment update." };
   }
 
-  const response = await authenticatedFetch(
-    `${baseUrl}/bookings/${encodeURIComponent(bookingId)}`,
-    {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ status }),
-    },
-  );
-
-  if (!response.ok) {
-    const message = await response.text();
-    throw new Error(
-      message || `Could not update appointment (HTTP ${response.status}).`,
+  try {
+    const response = await authenticatedFetch(
+      `${baseUrl}/bookings/${encodeURIComponent(bookingId)}`,
+      {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ status }),
+      },
     );
+
+    if (!response.ok) {
+      let message = `Could not update appointment (HTTP ${response.status}).`;
+      try {
+        const data = await response.json();
+        if (data?.message) {
+          message = data.message;
+        }
+      } catch {
+        // server JSON না পাঠালে default message থাকবে
+      }
+      return { ok: false, message };
+    }
+  } catch (error) {
+    console.error("Could not update appointment:", error);
+    return {
+      ok: false,
+      message:
+        error instanceof Error
+          ? error.message
+          : "Could not connect to the server. Please try again.",
+    };
   }
 
   revalidatePath("/dashboard/admin/manage-appointments");
+  revalidatePath("/dashboard/admin");
+
+  return {
+    ok: true,
+    message:
+      status === "Confirmed"
+        ? "The appointment has been confirmed."
+        : "The appointment has been cancelled.",
+  };
 }

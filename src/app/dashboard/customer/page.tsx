@@ -10,6 +10,7 @@ import {
   Heart,
   Search,
   Sparkles,
+  XCircle,
 } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
@@ -119,6 +120,45 @@ async function CustomerDashboardData() {
   const nextAppointment = upcomingAppointments[0];
   const userName = session?.user.name || "there";
 
+  // Status count for overview cards
+  const totalCount = bookings.length;
+  const pendingCount = bookings.filter(
+    (booking) => booking.status === "Pending",
+  ).length;
+  const confirmedCount = bookings.filter(
+    (booking) => booking.status === "Confirmed",
+  ).length;
+  const cancelledCount = bookings.filter(
+    (booking) => booking.status === "Cancelled",
+  ).length;
+
+  const statCards = [
+    {
+      label: "Total Appointment Requests",
+      value: totalCount,
+      icon: CalendarDays,
+      style: "bg-rose-50 text-[#e45c78]",
+    },
+    {
+      label: "Pending Appointments",
+      value: pendingCount,
+      icon: Clock3,
+      style: "bg-amber-50 text-amber-600",
+    },
+    {
+      label: "Confirmed Appointments",
+      value: confirmedCount,
+      icon: CalendarCheck,
+      style: "bg-emerald-50 text-emerald-600",
+    },
+    {
+      label: "Cancelled Appointments",
+      value: cancelledCount,
+      icon: XCircle,
+      style: "bg-slate-100 text-slate-600",
+    },
+  ];
+
   return (
     <div className="min-h-full bg-[#fffaf8] px-4 pb-10 pt-7 sm:px-7 lg:px-10">
       <div className="mx-auto max-w-7xl">
@@ -189,6 +229,31 @@ async function CustomerDashboardData() {
               </div>
             )}
           </div>
+        </section>
+
+        <section
+          aria-label="Appointment summary"
+          className="mt-7 grid grid-cols-2 gap-4 lg:grid-cols-4"
+        >
+          {statCards.map((card) => {
+            const Icon = card.icon;
+            return (
+              <div
+                key={card.label}
+                className="rounded-2xl border border-rose-100/70 bg-white p-5 shadow-sm shadow-rose-100/40"
+              >
+                <span
+                  className={`flex size-10 items-center justify-center rounded-xl ${card.style}`}
+                >
+                  <Icon aria-hidden="true" size={18} />
+                </span>
+                <p className="mt-4 font-heading text-2xl font-semibold text-[#352a31]">
+                  {card.value}
+                </p>
+                <p className="mt-1 text-xs text-[#9a8d95]">{card.label}</p>
+              </div>
+            );
+          })}
         </section>
 
         <div className="mt-7 grid gap-6 xl:grid-cols-[minmax(0,1.55fr)_minmax(260px,0.8fr)]">

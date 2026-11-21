@@ -12,6 +12,7 @@ import {
   X,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
+import { PayNowButton } from "@/components/appointments/pay-now-button"
 import { toast } from "@/components/ui/toast"
 import { authClient } from "@/lib/auth-client"
 import { getServices } from "@/lib/api/services"
@@ -238,19 +239,7 @@ function AppointmentActions({
       {appointment.status === "Confirmed" &&
         appointment.paymentStatus === "Unpaid" &&
         appointment.bookingId && (
-          <form action="/api/checkout_sessions" method="POST">
-            <input
-              type="hidden"
-              name="bookingId"
-              value={appointment.bookingId}
-            />
-            <Button
-              type="submit"
-              className="h-9 rounded-xl bg-[#e45c78] text-white hover:bg-[#d64f70]"
-            >
-              Pay Now
-            </Button>
-          </form>
+          <PayNowButton bookingId={appointment.bookingId} />
         )}
       <Button
         type="button"

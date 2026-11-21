@@ -1,10 +1,8 @@
 import { Suspense } from "react";
 import { TablePageSkeleton } from "@/components/skeletons";
-import { CalendarDays, X } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { updateAppointmentStatus } from "@/lib/actions/admin-appointments";
+import { CalendarDays } from "lucide-react";
 import { authenticatedFetch } from "@/lib/actions/authenticated-fetch";
-import { ConfirmAppointmentButton } from "./confirm-appointment-button";
+import { AppointmentActionButtons } from "./appointment-action-buttons";
 
 const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8000";
 
@@ -227,44 +225,10 @@ async function AppointmentsTable() {
                     {appointment._id &&
                     (appointment.status === "Pending" ||
                       appointment.status === "Confirmed") ? (
-                      <div className="flex items-center gap-2">
-                        {appointment.status === "Pending" && (
-                          <form action={updateAppointmentStatus}>
-                            <input
-                              type="hidden"
-                              name="bookingId"
-                              value={appointment._id}
-                            />
-                            <input
-                              type="hidden"
-                              name="status"
-                              value="Confirmed"
-                            />
-                            <ConfirmAppointmentButton />
-                          </form>
-                        )}
-                        <form action={updateAppointmentStatus}>
-                          <input
-                            type="hidden"
-                            name="bookingId"
-                            value={appointment._id}
-                          />
-                          <input
-                            type="hidden"
-                            name="status"
-                            value="Cancelled"
-                          />
-                          <Button
-                            type="submit"
-                            size="sm"
-                            variant="outline"
-                            className="inline-flex items-center gap-1 rounded-lg border-rose-200 text-rose-700 hover:bg-rose-50"
-                          >
-                            <X size={14} />
-                            Cancel
-                          </Button>
-                        </form>
-                      </div>
+                      <AppointmentActionButtons
+                        bookingId={appointment._id}
+                        status={appointment.status}
+                      />
                     ) : (
                       <span className="text-xs text-[#9a8d95]">—</span>
                     )}

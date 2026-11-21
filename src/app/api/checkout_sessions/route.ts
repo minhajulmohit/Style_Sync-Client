@@ -31,7 +31,10 @@ export async function POST(request: Request) {
     });
 
     if (!authSession?.session.token) {
-      return NextResponse.redirect(new URL("/signin", request.url), 303);
+      return NextResponse.json(
+        { error: "Please sign in again to continue." },
+        { status: 401 },
+      );
     }
 
     const userRole = authSession.user.role?.toLowerCase();
@@ -137,7 +140,7 @@ export async function POST(request: Request) {
         userId: authSession.user.id,
       },
       success_url: `${origin}/success?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${origin}/success?cancelled=1`,
+      cancel_url: `${origin}/payment-cancel`,
     });
 
     if (!checkoutSession.url) {
@@ -147,15 +150,13 @@ export async function POST(request: Request) {
       );
     }
 
-    return NextResponse.redirect(checkoutSession.url, 303);
+    // Pay Now button এই url নিয়ে Stripe Checkout এ যাবে
+    return NextResponse.json({ url: checkoutSession.url });
   } catch (error) {
     console.error("Could not create Stripe checkout session:", error);
     return NextResponse.json(
       {
-        error:
-          error instanceof Error
-            ? error.message
-            : "Could not start the payment.",
+        error: "Could not start the payment. Please try again.",
       },
       { status: 500 },
     );

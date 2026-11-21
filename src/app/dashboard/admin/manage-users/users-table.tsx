@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { UsersRound } from "lucide-react";
+import { Eye, UsersRound, X } from "lucide-react";
 import { toast } from "@/components/ui/toast";
 import { authClient } from "@/lib/auth-client";
 
@@ -10,6 +10,8 @@ export type AdminUser = {
   id?: string;
   name?: string;
   email?: string;
+  image?: string | null;
+  phone?: string | null;
   role?: string;
   createdAt?: string | Date;
   banned?: boolean;
@@ -32,6 +34,7 @@ function formatDate(value?: string | Date) {
 export function ManageUsersTable({ users: initialUsers }: { users: AdminUser[] }) {
   const [users, setUsers] = useState(initialUsers);
   const [updatingUserId, setUpdatingUserId] = useState<string | null>(null);
+  const [selectedUser, setSelectedUser] = useState<AdminUser | null>(null);
   const { data: session } = authClient.useSession();
 
   const toggleBlocked = async (user: AdminUser) => {
@@ -98,7 +101,7 @@ export function ManageUsersTable({ users: initialUsers }: { users: AdminUser[] }
     >
       <div className="flex items-center justify-between border-b border-rose-100/70 px-5 py-4">
         <h2 className="font-heading font-semibold text-[#493943]">
-          Registered users
+          Registered customers
         </h2>
         <span className="rounded-full bg-rose-50 px-3 py-1 text-xs font-medium text-[#b34d68]">
           {users.length} total
@@ -150,7 +153,15 @@ export function ManageUsersTable({ users: initialUsers }: { users: AdminUser[] }
                       {isBlocked ? "Blocked" : "Active"}
                     </span>
                   </td>
-                  <td className="px-4 py-4">
+                  <td className="flex items-center gap-2 px-4 py-4">
+                    <button
+                      type="button"
+                      onClick={() => setSelectedUser(user)}
+                      className="inline-flex items-center gap-1 rounded-lg border border-rose-100 px-3 py-2 text-xs font-medium text-[#756a72] transition hover:bg-rose-50 hover:text-[#e45c78]"
+                    >
+                      <Eye aria-hidden="true" size={14} />
+                      View Details
+                    </button>
                     <button
                       type="button"
                       onClick={() => toggleBlocked(user)}
@@ -186,13 +197,119 @@ export function ManageUsersTable({ users: initialUsers }: { users: AdminUser[] }
                     className="mx-auto mb-3 text-[#d3b8c0]"
                     size={28}
                   />
-                  <p className="font-medium text-[#493943]">No users found</p>
+                  <p className="font-medium text-[#493943]">No customers found</p>
                 </td>
               </tr>
             )}
           </tbody>
         </table>
       </div>
+
+      {selectedUser && (
+        <UserDetailsModal
+          user={
+            users.find(
+              (item) =>
+                (item.id ?? item._id) === (selectedUser.id ?? selectedUser._id),
+            ) ?? selectedUser
+          }
+          onClose={() => setSelectedUser(null)}
+        />
+      )}
     </section>
+  );
+}
+
+// User এর সব details popup এ দেখাই
+function UserDetailsModal({
+  user,
+  onClose,
+}: {
+  user: AdminUser;
+  onClose: () => void;
+}) {
+  const isBlocked = user.isBlocked === true || user.banned === true;
+  const details = [
+    { label: "Full Name", value: user.name || "Unnamed user" },
+    { label: "Email", value: user.email || "—" },
+    { label: "Phone", value: user.phone || "Not added" },
+    { label: "Role", value: user.role === "admin" ? "Admin" : "Customer" },
+    { label: "Joined", value: formatDate(user.createdAt) },
+    { label: "Account Status", value: isBlocked ? "Blocked" : "Active" },
+    { label: "User ID", value: user.id ?? user._id ?? "—" },
+  ];
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+      <button
+        type="button"
+        aria-label="Close user details"
+        className="absolute inset-0 size-full cursor-default bg-black/40"
+        onClick={onClose}
+      />
+      <section
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="user-details-title"
+        className="relative z-10 max-h-[90vh] w-full max-w-md overflow-y-auto rounded-3xl bg-white p-6 shadow-2xl sm:p-8"
+      >
+        <button
+          type="button"
+          aria-label="Close"
+          onClick={onClose}
+          className="absolute right-4 top-4 rounded-full p-2 text-[#8e7e86] hover:bg-rose-50"
+        >
+          <X aria-hidden="true" size={18} />
+        </button>
+
+        <div className="flex items-center gap-4 pr-8">
+          {user.image ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              src={user.image}
+              alt={user.name || "User"}
+              className="size-16 rounded-full object-cover"
+            />
+          ) : (
+            <span className="flex size-16 items-center justify-center rounded-full bg-rose-50 font-heading text-xl font-semibold text-[#e45c78]">
+              {(user.name || "U").charAt(0).toUpperCase()}
+            </span>
+          )}
+          <div className="min-w-0">
+            <p className="text-sm font-medium text-[#a28d97]">User details</p>
+            <h2
+              id="user-details-title"
+              className="mt-1 truncate font-heading text-lg font-semibold text-[#352a31]"
+            >
+              {user.name || "Unnamed user"}
+            </h2>
+          </div>
+        </div>
+
+        <dl className="mt-6 divide-y divide-rose-50 rounded-2xl bg-[#fffaf8] px-4">
+          {details.map((item) => (
+            <div
+              key={item.label}
+              className="flex items-start justify-between gap-4 py-3"
+            >
+              <dt className="text-xs text-[#9a8d95]">{item.label}</dt>
+              <dd className="break-all text-right text-sm font-medium text-[#493943]">
+                {item.value}
+              </dd>
+            </div>
+          ))}
+        </dl>
+
+        <div className="mt-6 flex justify-end">
+          <button
+            type="button"
+            onClick={onClose}
+            className="rounded-xl border border-rose-100 px-4 py-2 text-sm font-medium text-[#b34d68] hover:bg-rose-50"
+          >
+            Close
+          </button>
+        </div>
+      </section>
+    </div>
   );
 }
