@@ -1,17 +1,10 @@
-# SalonBook - Salon Service Booking Platform
+# StyleSync - Salon Service Booking Platform
 
-The client-side salon booking application for Assignment 9. The current
-application UI is branded as StyleSync.
+\*\*StyleSync\*\* is a full-stack, fully responsive web application designed to streamline appointment scheduling for salons and beauty parlors. Built using \*\*Next.js (App Router)\*\*, \*\*Express.js\*\*, \*\*MongoDB\*\*, \*\*Better Auth\*\*, and \*\*Stripe\*\*, the platform connects customers with professional salon services seamlessly while providing administrators with a powerful dashboard to manage services, bookings, users, and financial transactions in real time.
 
 ## Important Features
 
-- **Public:** Responsive design, dynamic hero statistics, featured services,
-  category filters, search, and sorting.
-- **Customer dashboard:** Overview, appointment history, cancellation of
-  pending bookings, and Stripe Checkout for confirmed appointments.
-- **Admin dashboard:** Analytics overview, service CRUD with ImgBB image
-  uploads, appointment status management, customer block/unblock, and a
-  transactions ledger.
+\### 👤 Customer Features \* \*\*Service Discovery:\*\* Explore salon services categorized by styling, skincare, coloring, and treatment, with live search, category filtering, and price sorting. \* \*\*Hassle-Free Booking:\*\* Interactive appointment request system allowing users to select dates, predefined time slots, and add custom notes. \* \*\*Appointment Tracking:\*\* Real-time dashboard to monitor booking status (\`Pending\`, \`Confirmed\`, \`Cancelled\`) and cancel pending requests. \* \*\*Secure Online Payments:\*\* Seamless integration with \*\*Stripe Checkout\*\* for fast and secure payments once appointments are confirmed. \* \*\*Personal Profile:\*\* Easily manage user details and update profile pictures via \*\*ImgBB API\*\*. ### 🛠️ Admin Control &amp; Dashboard \* \*\*Analytics Overview:\*\* High-level overview displaying total customers, active services, appointment metrics, and overall revenue. \* \*\*Service Management (CRUD):\*\* Add, update, delete, and toggle status (\`Active\`/\`Inactive\`) of salon services with strict payload validation. \* \*\*Appointment Workflow:\*\* Review incoming appointment requests and approve (\`Confirmed\`) or decline (\`Cancelled\`) bookings. \* \*\*User Oversight &amp; Security:\*\* View all registered customers with server-enforced \*\*Block/Unblock\*\* security controls. \* \*\*Financial Ledger:\*\* Immutable transaction tracking synced automatically via verified \*\*Stripe Webhooks\*\*.
 
 ## Technology Stack
 
