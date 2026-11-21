@@ -1,9 +1,10 @@
 import { Suspense } from "react";
 import { TablePageSkeleton } from "@/components/skeletons";
-import { CalendarDays, Check, X } from "lucide-react";
+import { CalendarDays, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { updateAppointmentStatus } from "@/lib/actions/admin-appointments";
 import { authenticatedFetch } from "@/lib/actions/authenticated-fetch";
+import { ConfirmAppointmentButton } from "./confirm-appointment-button";
 
 const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8000";
 
@@ -239,14 +240,7 @@ async function AppointmentsTable() {
                               name="status"
                               value="Confirmed"
                             />
-                            <Button
-                              type="submit"
-                              size="sm"
-                              className="inline-flex items-center gap-1 rounded-lg bg-emerald-600 text-white hover:bg-emerald-700"
-                            >
-                              <Check size={14} />
-                              Confirm
-                            </Button>
+                            <ConfirmAppointmentButton />
                           </form>
                         )}
                         <form action={updateAppointmentStatus}>

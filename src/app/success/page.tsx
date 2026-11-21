@@ -1,5 +1,4 @@
 import { Suspense } from "react";
-import Link from "next/link";
 import { CheckCircle2, CircleAlert } from "lucide-react";
 import { authenticatedFetch } from "@/lib/actions/authenticated-fetch";
 import { getStripe } from "@/lib/stripe";
@@ -71,12 +70,12 @@ function PaymentStatus({
             Stripe session: <span className="font-mono">{sessionId}</span>
           </p>
         )}
-        <Link
+        <a
           href="/dashboard/customer/my-appointments"
           className="mt-7 inline-flex h-11 items-center justify-center gap-2 rounded-xl bg-[#e45c78] px-5 text-sm font-semibold text-white transition hover:bg-[#d64f70]"
         >
           Back to appointments
-        </Link>
+        </a>
       </section>
     </main>
   );

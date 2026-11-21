@@ -16,8 +16,13 @@ import { Button } from "@/components/ui/button";
 import { authenticatedFetch } from "@/lib/actions/authenticated-fetch";
 import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
+import { redirect } from "next/navigation";
 
-const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8000";
+const baseUrl =
+  process.env.NEXT_PUBLIC_API_BASE_URL ||
+  (process.env.NODE_ENV === "production"
+    ? "https://style-sync-server.vercel.app"
+    : "http://localhost:8000");
 
 type CustomerBooking = {
   _id?: string;
@@ -67,13 +72,34 @@ export default function CustomerDashboardPage() {
 }
 
 async function CustomerDashboardData() {
-  const [session, response] = await Promise.all([
-    auth.api.getSession({ headers: await headers() }),
-    authenticatedFetch(`${baseUrl}/bookings`),
-  ]);
+  const session = await auth.api.getSession({ headers: await headers() });
+  if (!session) {
+    redirect("/signin");
+  }
+
+  let response: Response;
+  try {
+    response = await authenticatedFetch(`${baseUrl}/bookings`);
+  } catch (error) {
+    console.error("Could not request customer appointments:", error);
+    return (
+      <DashboardLoadError message="Could not connect to the appointment service. Please try again shortly." />
+    );
+  }
+
+  if (response.status === 401) {
+    redirect("/signin");
+  }
 
   if (!response.ok) {
-    throw new Error(`Could not load appointments (HTTP ${response.status}).`);
+    console.error(
+      `Could not load customer appointments (HTTP ${response.status}).`,
+    );
+    return (
+      <DashboardLoadError
+        message={`Could not load appointments (HTTP ${response.status}).`}
+      />
+    );
   }
 
   const bookings: CustomerBooking[] = await response.json();
@@ -282,5 +308,18 @@ async function CustomerDashboardData() {
         </div>
       </div>
     </div>
+  );
+}
+
+function DashboardLoadError({ message }: { message: string }) {
+  return (
+    <main className="min-h-full bg-[#fffaf8] px-4 py-10 sm:px-7 lg:px-10">
+      <div
+        role="alert"
+        className="mx-auto max-w-3xl rounded-2xl border border-rose-100 bg-white p-6 text-sm text-[#8e7e86] shadow-sm"
+      >
+        {message}
+      </div>
+    </main>
   );
 }

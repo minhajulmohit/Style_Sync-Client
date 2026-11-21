@@ -13,6 +13,7 @@ export type AdminUser = {
   role?: string;
   createdAt?: string | Date;
   banned?: boolean;
+  isBlocked?: boolean;
 };
 
 function formatDate(value?: string | Date) {
@@ -31,34 +32,50 @@ function formatDate(value?: string | Date) {
 export function ManageUsersTable({ users: initialUsers }: { users: AdminUser[] }) {
   const [users, setUsers] = useState(initialUsers);
   const [updatingUserId, setUpdatingUserId] = useState<string | null>(null);
+  const { data: session } = authClient.useSession();
 
   const toggleBlocked = async (user: AdminUser) => {
     const userId = user.id ?? user._id;
     if (!userId) return;
 
+    const isBlocked = user.isBlocked === true || user.banned === true;
     setUpdatingUserId(userId);
 
     try {
-      const { error } = user.banned
-        ? await authClient.admin.unbanUser({ userId })
-        : await authClient.admin.banUser({ userId });
+      const token = session?.session.token;
+      if (!token) {
+        throw new Error("Please sign in again to continue.");
+      }
 
-      if (error) {
-        throw new Error(error.message || "Could not update the account status.");
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8000"}/users/${encodeURIComponent(userId)}/block`,
+        {
+          method: "PATCH",
+          headers: {
+            authorization: `Bearer ${token}`,
+            "content-type": "application/json",
+          },
+          body: JSON.stringify({ isBlocked: !isBlocked }),
+        },
+      );
+      if (!response.ok) {
+        throw new Error(
+          `Could not update the account status (HTTP ${response.status}).`,
+        );
       }
 
       setUsers((currentUsers) =>
         currentUsers.map((currentUser) =>
           (currentUser.id ?? currentUser._id) === userId
-            ? { ...currentUser, banned: !user.banned }
+            ? { ...currentUser, banned: !isBlocked, isBlocked: !isBlocked }
             : currentUser,
         ),
       );
       toast.add({
         type: "success",
-        title: user.banned ? "Account unblocked" : "Account blocked",
+        title: isBlocked ? "Account unblocked" : "Account blocked",
         description: `${user.name || "The user"} can ${
-          user.banned ? "sign in again" : "no longer sign in"
+          isBlocked ? "sign in again" : "no longer sign in"
         }.`,
       });
     } catch (error) {
@@ -102,7 +119,11 @@ export function ManageUsersTable({ users: initialUsers }: { users: AdminUser[] }
           <tbody className="divide-y divide-rose-50">
             {users.map((user, index) => {
               const userId = user.id ?? user._id;
-              const isAdmin = user.role?.toLowerCase() === "admin";
+              const isAdmin = (user.role ?? "")
+                .split(",")
+                .some((role) => role.trim().toLowerCase() === "admin");
+              const isBlocked = user.isBlocked === true || user.banned === true;
+              const isCurrentUser = session?.user.id === userId;
               const isUpdating = updatingUserId === userId;
 
               return (
@@ -121,29 +142,35 @@ export function ManageUsersTable({ users: initialUsers }: { users: AdminUser[] }
                   <td className="px-4 py-4">
                     <span
                       className={`rounded-full px-2.5 py-1 text-xs font-medium ${
-                        user.banned
+                        isBlocked
                           ? "bg-rose-50 text-rose-700"
                           : "bg-emerald-50 text-emerald-700"
                       }`}
                     >
-                      {user.banned ? "Blocked" : "Active"}
+                      {isBlocked ? "Blocked" : "Active"}
                     </span>
                   </td>
                   <td className="px-4 py-4">
                     <button
                       type="button"
                       onClick={() => toggleBlocked(user)}
-                      disabled={!userId || isAdmin || isUpdating}
-                      title={isAdmin ? "Admin accounts cannot be blocked" : undefined}
+                      disabled={!userId || isAdmin || isCurrentUser || isUpdating}
+                      title={
+                        isAdmin
+                          ? "Admin accounts cannot be blocked"
+                          : isCurrentUser
+                            ? "You cannot block or unblock your own account"
+                            : undefined
+                      }
                       className={`rounded-lg px-3 py-2 text-xs font-medium transition disabled:pointer-events-none disabled:opacity-50 ${
-                        user.banned
+                        isBlocked
                           ? "border border-emerald-200 text-emerald-700 hover:bg-emerald-50"
                           : "border border-rose-200 text-rose-700 hover:bg-rose-50"
                       }`}
                     >
                       {isUpdating
                         ? "Updating..."
-                        : user.banned
+                        : isBlocked
                           ? "Unblock"
                           : "Block"}
                     </button>
