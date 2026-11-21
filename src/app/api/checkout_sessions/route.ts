@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { headers } from "next/headers";
 import { auth } from "@/lib/auth";
+import { authenticatedFetch } from "@/lib/actions/authenticated-fetch";
 import { getStripe } from "@/lib/stripe";
 
 const baseUrl =
@@ -30,7 +31,7 @@ export async function POST(request: Request) {
       headers: await headers(),
     });
 
-    if (!authSession?.session.token) {
+    if (!authSession?.user.id) {
       return NextResponse.json(
         { error: "Please sign in again to continue." },
         { status: 401 },
@@ -55,13 +56,7 @@ export async function POST(request: Request) {
       );
     }
 
-    const authorization = {
-      authorization: `Bearer ${authSession.session.token}`,
-    };
-    const bookingsResponse = await fetch(`${baseUrl}/bookings`, {
-      headers: authorization,
-      cache: "no-store",
-    });
+    const bookingsResponse = await authenticatedFetch(`${baseUrl}/bookings`);
 
     if (!bookingsResponse.ok) {
       return NextResponse.json(

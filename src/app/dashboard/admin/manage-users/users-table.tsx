@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Eye, UsersRound, X } from "lucide-react";
 import { toast } from "@/components/ui/toast";
 import { authClient } from "@/lib/auth-client";
+import { updateUserBlockStatus } from "@/lib/actions/admin-users";
 
 export type AdminUser = {
   _id?: string;
@@ -45,26 +46,9 @@ export function ManageUsersTable({ users: initialUsers }: { users: AdminUser[] }
     setUpdatingUserId(userId);
 
     try {
-      const token = session?.session.token;
-      if (!token) {
-        throw new Error("Please sign in again to continue.");
-      }
-
-      const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8000"}/users/${encodeURIComponent(userId)}/block`,
-        {
-          method: "PATCH",
-          headers: {
-            authorization: `Bearer ${token}`,
-            "content-type": "application/json",
-          },
-          body: JSON.stringify({ isBlocked: !isBlocked }),
-        },
-      );
-      if (!response.ok) {
-        throw new Error(
-          `Could not update the account status (HTTP ${response.status}).`,
-        );
+      const result = await updateUserBlockStatus(userId, !isBlocked);
+      if (!result.ok) {
+        throw new Error(result.message);
       }
 
       setUsers((currentUsers) =>
