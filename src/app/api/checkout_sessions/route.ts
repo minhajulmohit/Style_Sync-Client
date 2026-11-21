@@ -111,7 +111,9 @@ export async function POST(request: Request) {
       );
     }
 
-    const origin = new URL(request.url).origin;
+    const origin =
+      process.env.NEXT_PUBLIC_APP_URL?.replace(/\/$/, "") ||
+      new URL(request.url).origin;
     const checkoutSession = await getStripe().checkout.sessions.create({
       mode: "payment",
       customer_email: authSession.user.email,

@@ -115,7 +115,20 @@ async function PaymentResult({ searchParams }: PaymentPageProps) {
     );
   }
 
-  const stripeSession = await getStripe().checkout.sessions.retrieve(sessionId);
+  let stripeSession;
+  try {
+    stripeSession = await getStripe().checkout.sessions.retrieve(sessionId);
+  } catch (error) {
+    console.error("Could not retrieve Stripe checkout session:", error);
+    return (
+      <PaymentStatus
+        isSuccess={false}
+        title="Payment could not be verified"
+        message="Stripe verification is temporarily unavailable. Keep this page/session reference and try again after the Stripe configuration is restored."
+        sessionId={sessionId}
+      />
+    );
+  }
   if (
     stripeSession.status !== "complete" ||
     stripeSession.payment_status !== "paid"
@@ -130,15 +143,29 @@ async function PaymentResult({ searchParams }: PaymentPageProps) {
     );
   }
 
-  const response = await authenticatedFetch(
-    `${baseUrl}/payment/success-verify`,
-    {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ sessionId }),
-    },
-  );
-  const result: VerificationResult = await response.json();
+  let response: Response;
+  let result: VerificationResult;
+  try {
+    response = await authenticatedFetch(
+      `${baseUrl}/payment/success-verify`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ sessionId }),
+      },
+    );
+    result = await response.json();
+  } catch (error) {
+    console.error("Could not verify Stripe payment with the API:", error);
+    return (
+      <PaymentStatus
+        isSuccess={false}
+        title="Payment verification unavailable"
+        message="Stripe confirms this payment, but the appointment service could not be reached. Your payment should not be charged again; please contact support if the appointment is not marked paid."
+        sessionId={sessionId}
+      />
+    );
+  }
 
   if (!response.ok || !result.success) {
     return (

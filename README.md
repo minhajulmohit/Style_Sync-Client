@@ -27,6 +27,7 @@ Set these in a local `.env.local` file. Do not commit credentials.
 | `GOOGLE_CLIENT_ID` | Google OAuth client ID |
 | `GOOGLE_CLIENT_SECRET` | Google OAuth client secret |
 | `NEXT_PUBLIC_API_BASE_URL` | Base URL of the Express API |
+| `NEXT_PUBLIC_APP_URL` | Public URL of the Next.js app, for example `https://stylesyncclient.vercel.app` |
 | `IMAGEBB_API` | Server-side ImgBB image-upload API key |
 | `STRIPE_SECRET_KEY` | Server-side Stripe API secret |
 | `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY` | Stripe publishable key |
