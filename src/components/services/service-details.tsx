@@ -1,12 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import {
-  ArrowLeft,
-  CalendarPlus,
-  Clock3,
-  ImageIcon,
-} from "lucide-react";
+import { ArrowLeft, CalendarPlus, Clock3, ImageIcon } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -111,11 +106,11 @@ export function ServiceDetails({ id }: { id: string }) {
     <div className="min-h-full bg-[#fffaf8] px-4 pb-10 pt-7 sm:px-7 lg:px-10">
       <div className="mx-auto max-w-5xl">
         <Link
-          href={isAdmin ? "/dashboard/admin/manage-services" : "/"}
+          href={"/services"}
           className="mb-5 inline-flex items-center gap-2 text-sm font-medium text-[#8e7e86] transition hover:text-[#e45c78]"
         >
           <ArrowLeft size={16} />
-          {isAdmin ? "Back to services" : "Back home"}
+          Back to services
         </Link>
 
         {isLoading || isSessionPending ? (

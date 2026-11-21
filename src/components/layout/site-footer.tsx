@@ -1,5 +1,14 @@
 import Link from "next/link";
-import { Clock3, Mail, MapPin, Phone, Scissors } from "lucide-react";
+import {
+  Clock3,
+  House,
+  LogIn,
+  Mail,
+  MapPin,
+  Phone,
+  Scissors,
+  UserPlus,
+} from "lucide-react";
 import { FaFacebookF, FaInstagram } from "react-icons/fa";
 
 const footerHeadingClass =
@@ -8,10 +17,10 @@ const footerLinkClass =
   "text-sm leading-6 text-[#756a72] transition-colors hover:text-[#c65371]";
 
 const quickLinks = [
-  { href: "/", label: "Home" },
-  { href: "/services", label: "Services" },
-  { href: "/signin", label: "Sign in" },
-  { href: "/signup", label: "Create account" },
+  { href: "/", label: "Home", icon: House },
+  { href: "/services", label: "Services", icon: Scissors },
+  { href: "/signin", label: "Sign in", icon: LogIn },
+  { href: "/signup", label: "Create account", icon: UserPlus },
 ];
 
 const socialLinks = [
@@ -47,7 +56,7 @@ export default function SiteFooter() {
             </span>
           </Link>
           <p className="mt-3 text-sm leading-6 text-[#756a72]">
-            Salon bookings, made simple.
+            Find trusted salons, explore services, and book with ease.
           </p>
         </section>
 
@@ -57,9 +66,18 @@ export default function SiteFooter() {
         >
           <h2 className={footerHeadingClass}>Quick links</h2>
           <div className="mt-1 flex flex-col items-start gap-2">
-            {quickLinks.map(({ href, label }) => (
-              <Link key={href} href={href} className={footerLinkClass}>
-                {label}
+            {quickLinks.map(({ href, label, icon: Icon }) => (
+              <Link
+                key={href}
+                href={href}
+                className={`inline-flex items-center gap-2 ${footerLinkClass}`}
+              >
+                <Icon
+                  aria-hidden="true"
+                  size={15}
+                  className="shrink-0 text-[#e45c78]"
+                />
+                <span>{label}</span>
               </Link>
             ))}
           </div>
