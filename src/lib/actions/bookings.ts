@@ -45,7 +45,9 @@ export const getBookedSlots = async (
   date: string,
 ): Promise<BookedSlot[]> => {
   const query = new URLSearchParams({ serviceId, date });
-  const res = await fetch(`${baseUrl}/bookings/availability?${query}`);
+  const res = await authenticatedFetch(
+    `${baseUrl}/bookings/availability?${query}`,
+  );
 
   if (!res.ok) {
     throw new Error(`Could not load available times (HTTP ${res.status}).`);
