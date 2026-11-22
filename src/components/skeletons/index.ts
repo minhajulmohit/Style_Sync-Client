@@ -6,3 +6,9 @@ export { ServiceDetailsSkeleton } from "./service-details-skeleton";
 export { BrowseServicesSkeleton } from "./browse-services-skeleton";
 export { ProfileFormSkeleton } from "./profile-form-skeleton";
 export { ReviewsSkeleton } from "./reviews-skeleton";
+export {
+  DashboardSidebarFooterSkeleton,
+  DashboardSidebarHeaderSkeleton,
+  DashboardSidebarMenuSkeleton,
+  DashboardSidebarPromoSkeleton,
+} from "./dashboard-sidebar-skeleton";

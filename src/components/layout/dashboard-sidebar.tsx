@@ -12,8 +12,15 @@ import {
   UsersRound,
 } from "lucide-react";
 import Link from "next/link";
+import Image from "next/image";
 import { authClient } from "@/lib/auth-client";
 import { usePathname } from "next/navigation";
+import {
+  DashboardSidebarFooterSkeleton,
+  DashboardSidebarHeaderSkeleton,
+  DashboardSidebarMenuSkeleton,
+  DashboardSidebarPromoSkeleton,
+} from "@/components/skeletons";
 import {
   Sidebar,
   SidebarContent,
@@ -77,7 +84,8 @@ const customerLinks = [
 
 export function DashboardSidebar() {
   const pathname = usePathname();
-  const { data: session } = authClient.useSession();
+  const { data: session, isPending: isSessionPending } =
+    authClient.useSession();
   const roleIsAdmin = (session?.user?.role ?? "")
     .split(",")
     .some((role) => role.trim().toLowerCase() === "admin");
@@ -88,6 +96,8 @@ export function DashboardSidebar() {
   const email =
     session?.user?.email ||
     (isAdmin ? "admin@stylesync.com" : "customer@stylesync.com");
+  const firstLetter = name.trim().charAt(0).toUpperCase() || "U";
+  const profileImage = session?.user?.image;
 
   return (
     <Sidebar
@@ -109,9 +119,13 @@ export function DashboardSidebar() {
             <p className="font-heading text-lg font-bold tracking-tight text-[#352a31]">
               StyleSync
             </p>
-            <p className="text-xs text-[#9a8d95]">
-              {isAdmin ? "Salon workspace" : "Your beauty space"}
-            </p>
+            {isSessionPending ? (
+              <DashboardSidebarHeaderSkeleton />
+            ) : (
+              <p className="text-xs text-[#9a8d95]">
+                {isAdmin ? "Salon workspace" : "Your beauty space"}
+              </p>
+            )}
           </div>
         </Link>
       </SidebarHeader>
@@ -123,77 +137,96 @@ export function DashboardSidebar() {
           </SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu className="gap-1">
-              {links.map(({ label, icon: Icon, path }) => (
-                <SidebarMenuItem key={label}>
-                  <SidebarMenuButton
-                    render={<Link href={path} />}
-                    isActive={
-                      pathname === path ||
-                      (label !== "Overview" && pathname.startsWith(`${path}/`))
-                    }
-                    size="lg"
-                    tooltip={label}
-                    className="h-11 rounded-xl px-3 text-[#756a72] data-active:bg-rose-50 data-active:text-[#e94f72] data-active:shadow-sm data-active:shadow-rose-100/70"
-                  >
-                    <Icon aria-hidden="true" />
-                    <span className="group-data-[collapsible=icon]:hidden">
-                      {label}
-                    </span>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
+              {isSessionPending ? (
+                <DashboardSidebarMenuSkeleton />
+              ) : (
+                links.map(({ label, icon: Icon, path }) => (
+                  <SidebarMenuItem key={label}>
+                    <SidebarMenuButton
+                      render={<Link href={path} />}
+                      isActive={
+                        pathname === path ||
+                        (label !== "Overview" &&
+                          pathname.startsWith(`${path}/`))
+                      }
+                      size="lg"
+                      tooltip={label}
+                      className="h-11 rounded-xl px-3 text-[#756a72] data-active:bg-rose-50 data-active:text-[#e94f72] data-active:shadow-sm data-active:shadow-rose-100/70"
+                    >
+                      <Icon aria-hidden="true" />
+                      <span className="group-data-[collapsible=icon]:hidden">
+                        {label}
+                      </span>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                ))
+              )}
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
 
-        <div className="mx-3 mt-6 rounded-2xl bg-linear-to-br from-rose-50 via-orange-50 to-purple-50 p-4 group-data-[collapsible=icon]:hidden">
-          <ChartNoAxesCombined
-            aria-hidden="true"
-            className="mb-3 text-[#e96b83]"
-            size={20}
-          />
-          <p className="text-sm font-semibold text-[#493943]">
-            {isAdmin ? "Grow your salon" : "A little self-care?"}
-          </p>
-          <p className="mt-1 text-xs leading-5 text-[#8d7c85]">
-            {isAdmin
-              ? "Keep your services fresh and your clients smiling."
-              : "Your next favorite look is just an appointment away."}
-          </p>
-        </div>
+        {isSessionPending ? (
+          <DashboardSidebarPromoSkeleton />
+        ) : (
+          <div className="mx-3 mt-6 rounded-2xl bg-linear-to-br from-rose-50 via-orange-50 to-purple-50 p-4 group-data-[collapsible=icon]:hidden">
+            <ChartNoAxesCombined
+              aria-hidden="true"
+              className="mb-3 text-[#e96b83]"
+              size={20}
+            />
+            <p className="text-sm font-semibold text-[#493943]">
+              {isAdmin ? "Grow your salon" : "A little self-care?"}
+            </p>
+            <p className="mt-1 text-xs leading-5 text-[#8d7c85]">
+              {isAdmin
+                ? "Keep your services fresh and your clients smiling."
+                : "Your next favorite look is just an appointment away."}
+            </p>
+          </div>
+        )}
       </SidebarContent>
 
       <SidebarFooter className="border-t border-rose-100/70 p-4 group-data-[collapsible=icon]:items-center group-data-[collapsible=icon]:px-1.5">
         <SidebarMenu>
           <SidebarMenuItem>
-            <SidebarMenuButton
-              size="lg"
-              tooltip={name}
-              className="h-auto rounded-xl p-2"
-            >
-              <span className="flex size-9 shrink-0 items-center justify-center rounded-full bg-linear-to-br from-rose-200 to-orange-100 text-sm font-semibold text-[#8b4356] group-data-[collapsible=icon]:size-8">
-                <span className="group-data-[collapsible=icon]:hidden">
-                  {name.charAt(0).toUpperCase()}
+            {isSessionPending ? (
+              <DashboardSidebarFooterSkeleton />
+            ) : (
+              <SidebarMenuButton
+                size="lg"
+                tooltip={name}
+                className="h-auto rounded-xl p-2"
+              >
+                <span className="flex size-9 shrink-0 items-center justify-center overflow-hidden rounded-full bg-linear-to-br from-rose-200 to-orange-100 text-sm font-semibold text-[#8b4356] group-data-[collapsible=icon]:size-8">
+                  {profileImage ? (
+                    <Image
+                      src={profileImage}
+                      alt={`${name}'s profile picture`}
+                      width={36}
+                      height={36}
+                      unoptimized
+                      className="size-full object-cover"
+                    />
+                  ) : session ? (
+                    firstLetter
+                  ) : (
+                    <UserRound aria-hidden="true" size={16} />
+                  )}
+                </span>
+                <span className="min-w-0 group-data-[collapsible=icon]:hidden">
+                  <span className="block truncate text-sm font-semibold text-[#493943]">
+                    {name}
+                  </span>
+                  <span className="block truncate text-xs font-normal text-[#9a8d95]">
+                    {email}
+                  </span>
                 </span>
                 <UserRound
                   aria-hidden="true"
-                  className="hidden group-data-[collapsible=icon]:block"
-                  size={16}
+                  className="ml-auto text-[#b5a8af] group-data-[collapsible=icon]:hidden"
                 />
-              </span>
-              <span className="min-w-0 group-data-[collapsible=icon]:hidden">
-                <span className="block truncate text-sm font-semibold text-[#493943]">
-                  {name}
-                </span>
-                <span className="block truncate text-xs font-normal text-[#9a8d95]">
-                  {email}
-                </span>
-              </span>
-              <UserRound
-                aria-hidden="true"
-                className="ml-auto text-[#b5a8af] group-data-[collapsible=icon]:hidden"
-              />
-            </SidebarMenuButton>
+              </SidebarMenuButton>
+            )}
           </SidebarMenuItem>
         </SidebarMenu>
       </SidebarFooter>
