@@ -25,9 +25,17 @@ export const getServices = async (
 export const getServiceId = async (
   serviceId: string,
 ): Promise<ServiceRecord | null> => {
+  if (!/^[\da-f]{24}$/i.test(serviceId)) {
+    return null
+  }
+
   const res = await fetch(
     `${getApiBaseUrl()}/services/${encodeURIComponent(serviceId)}`,
   )
+
+  if (res.status === 404) {
+    return null
+  }
 
   if (!res.ok) {
     throw new Error(`Could not load service (HTTP ${res.status}).`)

@@ -5,6 +5,7 @@ import { ArrowLeft, ImagePlus, LoaderCircle, PlusCircle } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
+import { toast } from "@/components/ui/toast";
 import { addService } from "@/lib/actions/services";
 import { uploadImageToImgBB } from "@/lib/api/image-upload";
 import {
@@ -17,8 +18,6 @@ const fieldClassName =
 
 export default function AddServicePage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [errorMessage, setErrorMessage] = useState("");
-  const [successMessage, setSuccessMessage] = useState("");
   const [imagePreview, setImagePreview] = useState<string | null>(null);
 
   const handleImageChange = (event: ChangeEvent<HTMLInputElement>) => {
@@ -31,18 +30,25 @@ export default function AddServicePage() {
 
     if (!image.type.startsWith("image/")) {
       setImagePreview(null);
-      setErrorMessage("Choose an image file to continue.");
+      toast.add({
+        type: "error",
+        title: "Choose an image file",
+        description: "Select an image file to continue.",
+      });
       event.currentTarget.value = "";
       return;
     }
     if (image.size > 4 * 1024 * 1024) {
       setImagePreview(null);
-      setErrorMessage("Choose an image smaller than 4 MB.");
+      toast.add({
+        type: "error",
+        title: "Image is too large",
+        description: "Choose an image smaller than 4 MB.",
+      });
       event.currentTarget.value = "";
       return;
     }
 
-    setErrorMessage("");
     const reader = new FileReader();
 
     reader.onload = () => {
@@ -53,7 +59,11 @@ export default function AddServicePage() {
 
     reader.onerror = () => {
       setImagePreview(null);
-      setErrorMessage("Could not preview this image. Please choose it again.");
+      toast.add({
+        type: "error",
+        title: "Could not preview this image",
+        description: "Please choose it again.",
+      });
     };
 
     reader.readAsDataURL(image);
@@ -61,8 +71,6 @@ export default function AddServicePage() {
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    setErrorMessage("");
-    setSuccessMessage("");
 
     const form = event.currentTarget;
     const formData = new FormData(form);
@@ -93,9 +101,12 @@ export default function AddServicePage() {
       image.size === 0 ||
       !status
     ) {
-      setErrorMessage(
-        "Fill in all fields. Price and duration must be greater than zero, and choose an image.",
-      );
+      toast.add({
+        type: "error",
+        title: "Check the service details",
+        description:
+          "Fill in all fields. Price and duration must be greater than zero, and choose an image.",
+      });
       return;
     }
 
@@ -116,14 +127,21 @@ export default function AddServicePage() {
 
       form.reset();
       setImagePreview(null);
-      setSuccessMessage("Service added successfully.");
+      toast.add({
+        type: "success",
+        title: "Service added",
+        description: "The service was added successfully.",
+      });
     } catch (error) {
       console.error("Could not add service:", error);
-      setErrorMessage(
-        error instanceof Error
-          ? error.message
-          : "Could not add the service. Please try again.",
-      );
+      toast.add({
+        type: "error",
+        title: "Could not add service",
+        description:
+          error instanceof Error
+            ? error.message
+            : "Please try again.",
+      });
     } finally {
       setIsSubmitting(false);
     }
@@ -336,23 +354,6 @@ export default function AddServicePage() {
               </label>
             </div>
           </div>
-
-          {errorMessage && (
-            <p
-              role="alert"
-              className="mt-5 rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-700"
-            >
-              {errorMessage}
-            </p>
-          )}
-          {successMessage && (
-            <p
-              role="status"
-              className="mt-5 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-700"
-            >
-              {successMessage}
-            </p>
-          )}
 
           <div className="mt-7 flex justify-end border-t border-rose-50 pt-5">
             <Button

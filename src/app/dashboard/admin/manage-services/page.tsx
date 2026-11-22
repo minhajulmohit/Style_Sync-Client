@@ -5,6 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { Clock3, Eye, ImageIcon, LoaderCircle, PackageOpen, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { toast } from "@/components/ui/toast";
 import { DeleteServiceButton } from "@/components/services/delete-service-button";
 import { ServiceStatusToggle } from "@/components/services/service-status-toggle";
 import { UpdateServiceButton } from "@/components/services/update-service-button";
@@ -257,14 +258,33 @@ export default function ManageServicesPage() {
                           <div className="flex items-center gap-2">
                             {serviceId && (
                               <>
-                                <Link
-                                  href={`/services/${serviceId}`}
-                                  aria-label={`View ${service.serviceName}`}
-                                  title="View details"
-                                  className="inline-flex size-10 items-center justify-center rounded-xl border border-rose-100 text-[#756a72] transition hover:bg-rose-50 hover:text-[#d95272]"
-                                >
-                                  <Eye aria-hidden="true" size={17} />
-                                </Link>
+                                {service.status === "Active" ? (
+                                  <Link
+                                    href={`/services/${serviceId}`}
+                                    aria-label={`View ${service.serviceName}`}
+                                    title="View details"
+                                    className="inline-flex size-10 items-center justify-center rounded-xl border border-rose-100 text-[#756a72] transition hover:bg-rose-50 hover:text-[#d95272]"
+                                  >
+                                    <Eye aria-hidden="true" size={17} />
+                                  </Link>
+                                ) : (
+                                  <button
+                                    type="button"
+                                    aria-label={`Activate ${service.serviceName} to view details`}
+                                    title="Activate this service to view details"
+                                    onClick={() =>
+                                      toast.add({
+                                        type: "warning",
+                                        title: "Service is inactive",
+                                        description:
+                                          "Activate this service first to view its details.",
+                                      })
+                                    }
+                                    className="inline-flex size-10 items-center justify-center rounded-xl border border-rose-100 text-[#756a72] transition hover:bg-rose-50 hover:text-[#d95272]"
+                                  >
+                                    <Eye aria-hidden="true" size={17} />
+                                  </button>
+                                )}
                                 <UpdateServiceButton
                                   service={service}
                                   serviceId={serviceId}

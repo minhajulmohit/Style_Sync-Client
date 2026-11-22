@@ -12,6 +12,15 @@ import {
   X,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
+import {
+  AlertDialog,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog"
 import { PayNowButton } from "@/components/appointments/pay-now-button"
 import { toast } from "@/components/ui/toast"
 import { authClient } from "@/lib/auth-client"
@@ -220,9 +229,20 @@ function AppointmentActions({
 }: {
   appointment: Appointment
   isCancelling: boolean
-  onCancel: (appointment: Appointment) => void
+  onCancel: (appointment: Appointment) => Promise<void>
   onViewDetails: (appointment: Appointment) => void
 }) {
+  const [isCancelDialogOpen, setIsCancelDialogOpen] = useState(false)
+
+  const confirmCancel = async () => {
+    if (isCancelling) {
+      return
+    }
+
+    await onCancel(appointment)
+    setIsCancelDialogOpen(false)
+  }
+
   return (
     <div className="flex flex-wrap gap-2">
       {appointment.status === "Pending" && appointment.bookingId && (
@@ -230,12 +250,43 @@ function AppointmentActions({
           type="button"
           variant="outline"
           disabled={isCancelling}
-          onClick={() => onCancel(appointment)}
+          onClick={() => setIsCancelDialogOpen(true)}
           className="h-9 rounded-xl border-rose-100 text-[#b34d68] hover:bg-rose-50"
         >
           {isCancelling ? "Cancelling..." : "Cancel Request"}
         </Button>
       )}
+      <AlertDialog
+        open={isCancelDialogOpen}
+        onOpenChange={(open) => {
+          if (!isCancelling) {
+            setIsCancelDialogOpen(open)
+          }
+        }}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Cancel this appointment request?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Your pending request for {appointment.serviceName} will be
+              cancelled. This cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={isCancelling}>
+              Keep request
+            </AlertDialogCancel>
+            <Button
+              type="button"
+              variant="destructive"
+              disabled={isCancelling}
+              onClick={() => void confirmCancel()}
+            >
+              {isCancelling ? "Cancelling..." : "Cancel request"}
+            </Button>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
       {appointment.status === "Confirmed" &&
         appointment.paymentStatus === "Unpaid" &&
         appointment.bookingId && (

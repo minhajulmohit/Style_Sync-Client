@@ -2,6 +2,16 @@
 
 import { useState } from "react";
 import { Eye, UsersRound, X } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import {
+  AlertDialog,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { toast } from "@/components/ui/toast";
 import { authClient } from "@/lib/auth-client";
 import { updateUserBlockStatus } from "@/lib/actions/admin-users";
@@ -36,6 +46,9 @@ export function ManageUsersTable({ users: initialUsers }: { users: AdminUser[] }
   const [users, setUsers] = useState(initialUsers);
   const [updatingUserId, setUpdatingUserId] = useState<string | null>(null);
   const [selectedUser, setSelectedUser] = useState<AdminUser | null>(null);
+  const [pendingBlockUser, setPendingBlockUser] = useState<AdminUser | null>(
+    null,
+  );
   const { data: session } = authClient.useSession();
 
   const toggleBlocked = async (user: AdminUser) => {
@@ -75,6 +88,7 @@ export function ManageUsersTable({ users: initialUsers }: { users: AdminUser[] }
       });
     } finally {
       setUpdatingUserId(null);
+      setPendingBlockUser(null);
     }
   };
 
@@ -148,7 +162,7 @@ export function ManageUsersTable({ users: initialUsers }: { users: AdminUser[] }
                     </button>
                     <button
                       type="button"
-                      onClick={() => toggleBlocked(user)}
+                      onClick={() => setPendingBlockUser(user)}
                       disabled={!userId || isAdmin || isCurrentUser || isUpdating}
                       title={
                         isAdmin
@@ -188,6 +202,55 @@ export function ManageUsersTable({ users: initialUsers }: { users: AdminUser[] }
           </tbody>
         </table>
       </div>
+
+      <AlertDialog
+        open={pendingBlockUser !== null}
+        onOpenChange={(open) => {
+          if (!updatingUserId && !open) {
+            setPendingBlockUser(null);
+          }
+        }}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>
+              {pendingBlockUser?.isBlocked || pendingBlockUser?.banned
+                ? "Unblock this account?"
+                : "Block this account?"}
+            </AlertDialogTitle>
+            <AlertDialogDescription>
+              {pendingBlockUser?.isBlocked || pendingBlockUser?.banned
+                ? `${pendingBlockUser.name || "This customer"} will be able to sign in again.`
+                : `${pendingBlockUser?.name || "This customer"} will no longer be able to sign in.`}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={updatingUserId !== null}>
+              Go back
+            </AlertDialogCancel>
+            <Button
+              type="button"
+              variant={
+                pendingBlockUser?.isBlocked || pendingBlockUser?.banned
+                  ? "default"
+                  : "destructive"
+              }
+              disabled={updatingUserId !== null}
+              onClick={() => {
+                if (pendingBlockUser) {
+                  void toggleBlocked(pendingBlockUser);
+                }
+              }}
+            >
+              {updatingUserId !== null
+                ? "Updating..."
+                : pendingBlockUser?.isBlocked || pendingBlockUser?.banned
+                  ? "Unblock account"
+                  : "Block account"}
+            </Button>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
 
       {selectedUser && (
         <UserDetailsModal

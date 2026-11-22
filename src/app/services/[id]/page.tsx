@@ -4,6 +4,7 @@ import { redirect } from "next/navigation"
 import { auth } from "@/lib/auth"
 import { ServiceDetails } from "@/components/services/service-details"
 import { ServiceDetailsSkeleton } from "@/components/skeletons"
+import { SiteLayout } from "@/components/layout/site-layout"
 
 async function ServiceDetailsWithId({
   params,
@@ -26,8 +27,10 @@ export default function ServiceDetailsPage({
   params: Promise<{ id: string }>
 }) {
   return (
-    <Suspense fallback={<ServiceDetailsSkeleton />}>
-      <ServiceDetailsWithId params={params} />
-    </Suspense>
+    <SiteLayout>
+      <Suspense fallback={<ServiceDetailsSkeleton />}>
+        <ServiceDetailsWithId params={params} />
+      </Suspense>
+    </SiteLayout>
   )
 }

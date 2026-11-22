@@ -3,6 +3,7 @@ import { CheckCircle2, CircleAlert } from "lucide-react";
 import { authenticatedFetch } from "@/lib/actions/authenticated-fetch";
 import { getStripe } from "@/lib/stripe";
 import { PaymentStatusRefresh } from "@/components/payment/payment-status-refresh";
+import { SiteLayout } from "@/components/layout/site-layout";
 
 const baseUrl =
   process.env.NEXT_PUBLIC_API_BASE_URL ||
@@ -40,7 +41,7 @@ function PaymentStatus({
   refreshPending?: boolean;
 }) {
   return (
-    <main className="flex min-h-[calc(100svh-5rem)] items-center justify-center bg-[#fffaf8] px-4 py-10">
+    <main className="flex flex-1 items-center justify-center bg-[#fffaf8] px-4 py-10">
       <section className="w-full max-w-lg rounded-3xl border border-rose-100/70 bg-white p-7 text-center shadow-lg shadow-rose-100/50 sm:p-9">
         <span
           className={`mx-auto flex size-14 items-center justify-center rounded-full ${
@@ -86,15 +87,17 @@ function PaymentStatus({
 
 export default function PaymentSuccessPage({ searchParams }: PaymentPageProps) {
   return (
-    <Suspense
-      fallback={
-        <main className="flex min-h-[calc(100svh-5rem)] items-center justify-center bg-[#fffaf8] px-4 text-sm text-[#8e7e86]">
-          Checking payment...
-        </main>
-      }
-    >
-      <PaymentResult searchParams={searchParams} />
-    </Suspense>
+    <SiteLayout>
+      <Suspense
+        fallback={
+          <main className="flex flex-1 items-center justify-center bg-[#fffaf8] px-4 text-sm text-[#8e7e86]">
+            Checking payment...
+          </main>
+        }
+      >
+        <PaymentResult searchParams={searchParams} />
+      </Suspense>
+    </SiteLayout>
   );
 }
 
