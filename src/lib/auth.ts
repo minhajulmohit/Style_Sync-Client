@@ -1,6 +1,6 @@
 import { betterAuth } from "better-auth";
 import { APIError, createAuthMiddleware } from "better-auth/api";
-import { admin } from "better-auth/plugins";
+import { admin, jwt } from "better-auth/plugins";
 
 import { MongoClient, ObjectId } from "mongodb";
 
@@ -157,5 +157,5 @@ export const auth = betterAuth({
   database: mongodbAdapter(db, {
     client,
   }),
-  plugins: [admin({ defaultRole: "customer" })],
+  plugins: [admin({ defaultRole: "customer" }), jwt()],
 });

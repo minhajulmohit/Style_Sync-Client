@@ -29,8 +29,7 @@ export default function CustomerReviews() {
   const [activeIndex, setActiveIndex] = useState(0);
 
   useEffect(() => {
-    const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
-    fetch(`${baseUrl}/reviews`)
+    fetch("/api/backend/reviews")
       .then((res) => res.json())
       .then((data) => {
         setReviews(data);

@@ -16,13 +16,11 @@ export default function Hero() {
 
   useEffect(() => {
     let isMounted = true;
-    const baseUrl =
-      process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8000";
 
     async function loadStats() {
       const [servicesResult, reviewsResult] = await Promise.allSettled([
         getServices(),
-        fetch(`${baseUrl}/reviews`, { cache: "no-store" }).then(
+        fetch("/api/backend/reviews", { cache: "no-store" }).then(
           async (response) => {
             if (!response.ok) {
               throw new Error(`Could not load reviews (HTTP ${response.status}).`);
