@@ -33,14 +33,13 @@ export function PayNowButton({ bookingId }: PayNowButtonProps) {
       try {
         data = await response.json();
       } catch {
-        // JSON না আসলে নিচের default error দেখাবে
       }
 
       if (!response.ok || !data.url) {
         throw new Error(data.error || "Could not start the payment.");
       }
 
-      // Stripe Checkout page এ পাঠাই (loader চলতে থাকবে)
+
       window.location.href = data.url;
     } catch (error) {
       console.error("Payment start failed:", error);

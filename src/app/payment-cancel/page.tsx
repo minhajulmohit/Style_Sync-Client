@@ -2,7 +2,6 @@ import Link from "next/link";
 import { CircleX } from "lucide-react";
 import { SiteLayout } from "@/components/layout/site-layout";
 
-// Stripe এ Cancel চাপলে এই page এ আসবে
 export default function PaymentCancelPage() {
   return (
     <SiteLayout>

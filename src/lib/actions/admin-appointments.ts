@@ -12,8 +12,6 @@ export type AppointmentActionResult = {
   message: string;
 };
 
-// Admin Confirm / Cancel. Error throw না করে result return করি,
-// যাতে client component toast দেখাতে পারে।
 export async function updateAppointmentStatus(
   bookingId: string,
   status: AppointmentStatusUpdate,
@@ -40,7 +38,6 @@ export async function updateAppointmentStatus(
           message = data.message;
         }
       } catch {
-        // server JSON না পাঠালে default message থাকবে
       }
       return { ok: false, message };
     }
