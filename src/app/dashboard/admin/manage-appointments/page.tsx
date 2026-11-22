@@ -1,5 +1,4 @@
 import { Suspense } from "react";
-import { TablePageSkeleton } from "@/components/skeletons";
 import { CalendarDays } from "lucide-react";
 import { authenticatedFetch } from "@/lib/actions/authenticated-fetch";
 import { AppointmentActionButtons } from "./appointment-action-buttons";

@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { Clock3, Eye, ImageIcon, LoaderCircle, PackageOpen, Plus } from "lucide-react";
+import { Clock3, Eye, ImageIcon, PackageOpen, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { toast } from "@/components/ui/toast";
 import { DeleteServiceButton } from "@/components/services/delete-service-button";
