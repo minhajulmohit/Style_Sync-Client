@@ -1,5 +1,5 @@
 import { Skeleton } from "@/components/ui/skeleton";
-import { SidebarMenuSkeleton } from "@/components/ui/sidebar";
+import { SidebarMenuItem } from "@/components/ui/sidebar";
 
 export function DashboardSidebarHeaderSkeleton() {
   return <Skeleton className="mt-1 h-3 w-28 bg-rose-100/70" />;
@@ -8,8 +8,15 @@ export function DashboardSidebarHeaderSkeleton() {
 export function DashboardSidebarMenuSkeleton() {
   return (
     <>
-      {Array.from({ length: 5 }, (_, index) => (
-        <SidebarMenuSkeleton key={index} showIcon />
+      {["w-24", "w-32", "w-28", "w-36", "w-20"].map((width, index) => (
+        <SidebarMenuItem key={index}>
+          <div className="flex h-11 items-center gap-3 rounded-xl px-3">
+            <Skeleton className="size-4 shrink-0 rounded-md bg-rose-100/70" />
+            <Skeleton
+              className={`h-3 bg-rose-100/70 group-data-[collapsible=icon]:hidden ${width}`}
+            />
+          </div>
+        </SidebarMenuItem>
       ))}
     </>
   );
